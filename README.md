@@ -1,12 +1,13 @@
 # Ussuri River freshwater-fish eDNA — analysis code and data
 
-**English** · [中文](README.zh-CN.md)
-
 Reproducible R code and derived data for a 12S environmental-DNA (eDNA) metabarcoding study of the
 freshwater fish community of the **Ussuri River** (a large transboundary tributary of the Amur /
 Heilongjiang). The scripts reproduce every result in the manuscript — community composition, alpha and
 beta diversity, taxonomic–functional coupling, and the longitudinal hydro-geographic gradient — from the
 tables in [`data/`](data), with no internet access or raw sequence reads required.
+
+*中文摘要：* 本仓库提供乌苏里江淡水鱼类 12S eDNA 宏条形码研究的可重现 R 代码与派生数据，仅用 `data/` 中的数据即可重现
+稿件全部结果（群落组成、alpha 与 beta 多样性、分类—功能耦合、纵向水文—地理梯度），无需联网或原始测序数据。
 
 ## Repository layout
 
