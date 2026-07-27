@@ -1,0 +1,16 @@
+English (authoritative): LICENSE  ·  中文（便利性翻译）：本文件
+
+本仓库采用双许可，两者均要求署名且仅限非商业使用：
+
+  * 源代码 —— `code/` 目录下的全部内容 —— 采用 PolyForm Noncommercial License 1.0.0，
+    见 LICENSE-CODE（中文说明见 LICENSE-CODE.zh-CN）。
+
+  * 数据与文档 —— `data/` 中的 CSV、`outputs/` 中生成的表，以及随附文档 —— 采用
+    知识共享 署名—非商业性使用 4.0 国际（CC BY-NC 4.0），见 LICENSE-DATA
+    （中文说明见 LICENSE-DATA.zh-CN）。
+
+版权所有 (c) 2026 Ruiyi Li, Peilun Li, Jiacheng Liu, Shuhan Xiong and Jilong Wang。
+
+署名方式：请引用相关文章与本仓库（见 CITATION.cff，或 CITATION.bib 提供 BibTeX/LaTeX 条目）。
+
+注：本中文文件为便利性翻译，并非正式法律文本；如与英文版 LICENSE 有出入，以英文版为准。

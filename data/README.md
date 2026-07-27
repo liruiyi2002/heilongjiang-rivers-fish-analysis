@@ -1,10 +1,10 @@
 # Data provenance
 
+**English** · [中文](README.zh-CN.md)
+
 Every file in this folder and where it comes from. Numeric precision is kept at a level the data can
 support: Gower distances to 4 dp; coordinates and PC scores to 3 dp; continuous traits to 1-2 dp; read
 counts are integers.
-
-*中文摘要：* 本目录列出 `data/` 中每个文件的来源。数值精度与数据可支撑的水平一致；读数为整数。
 
 ## Files
 

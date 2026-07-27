@@ -1,11 +1,10 @@
-# Analysis code / 分析代码
+# Analysis code
+
+**English** · [中文](README.zh-CN.md)
 
 R scripts that reproduce **every result in the manuscript** from the tables in [`../data/`](../data).
 They print the headline numbers to the console and write the supplementary tables to `../outputs/`.
 No internet or raw sequence reads are needed (only a one-off package install on first run).
-
-*中文摘要：* 本目录的 R 脚本仅用 `../data/` 中的数据即可重现稿件的全部结果，结果打印到控制台，附表写入 `../outputs/`。
-运行时无需联网或原始测序数据（仅首次运行时自动安装缺失的 R 包）。
 
 ---
 
