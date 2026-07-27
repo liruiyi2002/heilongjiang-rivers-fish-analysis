@@ -86,4 +86,5 @@ Dual-licensed (both attribution + non-commercial): **code** under the PolyForm N
 1.0.0 ([`../LICENSE-CODE`](../LICENSE-CODE)); **data and docs** under CC BY-NC 4.0
 ([`../LICENSE-DATA`](../LICENSE-DATA)); summary in [`../LICENSE`](../LICENSE). To cite, see
 `../CITATION.cff` (or `../CITATION.bib` for BibTeX/LaTeX).
-Repository: <https://github.com/liruiyi2002/heilongjiang-rivers-fish-analysis>.
+Repository: <https://github.com/liruiyi2002/heilongjiang-rivers-fish-analysis>;
+archived release DOI: <https://doi.org/10.5281/zenodo.21622890>.

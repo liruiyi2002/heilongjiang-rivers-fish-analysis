@@ -57,7 +57,8 @@ NCBI Sequence Read Archive (see the manuscript's data-availability statement for
 ## Citation
 
 Please cite the associated article together with this repository — see [`CITATION.cff`](CITATION.cff),
-or [`CITATION.bib`](CITATION.bib) for a BibTeX/LaTeX entry.
+or [`CITATION.bib`](CITATION.bib) for a BibTeX/LaTeX entry. The archived release (v1.0.0) has a
+persistent DOI on Zenodo: [10.5281/zenodo.21622890](https://doi.org/10.5281/zenodo.21622890).
 
 ## License
 

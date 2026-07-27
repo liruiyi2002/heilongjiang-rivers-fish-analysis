@@ -51,6 +51,7 @@ Rscript code/run_all.R
 ## 引用
 
 请同时引用相关文章与本仓库——见 [`CITATION.cff`](CITATION.cff)，或 [`CITATION.bib`](CITATION.bib)（BibTeX/LaTeX）。
+存档版本（v1.0.0）在 Zenodo 上有持久 DOI：[10.5281/zenodo.21622890](https://doi.org/10.5281/zenodo.21622890)。
 
 ## 许可协议
 
