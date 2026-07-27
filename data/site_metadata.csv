@@ -1,0 +1,27 @@
+"sample","site","season","section","site_name","channel_type","lon","lat"
+"Spring_W01","W01","Spring","Upstream","Bawuba (858) Farm","main stem",133.4458,45.64673
+"Spring_W02","W02","Spring","Upstream","Hutou","main stem",133.6774,45.9784
+"Spring_W03","W03","Spring","Downstream","Raohe","main stem",134.0299,46.80304
+"Spring_W04","W04","Spring","Downstream","Sipai","main stem",134.0601,46.96811
+"Spring_W05","W05","Spring","Downstream","Haiqing","main stem",134.6636,47.86729
+"Spring_W06","W06","Spring","Downstream","Zhuaji","main stem",134.6682,48.17566
+"Spring_W07","W07","Spring","Downstream","Tongjiangkou","main stem",134.7071,48.27508
+"Spring_W08","W08","Spring","Tributary","Songacha River site","tributary",133.3576,45.57346
+"Spring_W09","W09","Spring","Tributary","Muling River site","tributary",133.465,45.88567
+"Spring_W10","W10","Spring","Tributary","Qihulin River site","tributary",133.6482,46.09329
+"Spring_W11","W11","Spring","Tributary","Dumu River site","tributary",133.5639,46.35535
+"Spring_W12","W12","Spring","Tributary","Abuqin River site","tributary",133.6116,46.17342
+"Spring_W13","W13","Spring","Tributary","Naoli River site","tributary",133.766,47.25273
+"Autumn_W01","W01","Autumn","Upstream","Bawuba (858) Farm","main stem",133.4458,45.64673
+"Autumn_W02","W02","Autumn","Upstream","Hutou","main stem",133.6774,45.9784
+"Autumn_W03","W03","Autumn","Downstream","Raohe","main stem",134.0299,46.80304
+"Autumn_W04","W04","Autumn","Downstream","Sipai","main stem",134.0601,46.96811
+"Autumn_W05","W05","Autumn","Downstream","Haiqing","main stem",134.6636,47.86729
+"Autumn_W06","W06","Autumn","Downstream","Zhuaji","main stem",134.6682,48.17566
+"Autumn_W07","W07","Autumn","Downstream","Tongjiangkou","main stem",134.7071,48.27508
+"Autumn_W08","W08","Autumn","Tributary","Songacha River site","tributary",133.3576,45.57346
+"Autumn_W09","W09","Autumn","Tributary","Muling River site","tributary",133.465,45.88567
+"Autumn_W10","W10","Autumn","Tributary","Qihulin River site","tributary",133.6482,46.09329
+"Autumn_W11","W11","Autumn","Tributary","Dumu River site","tributary",133.5639,46.35535
+"Autumn_W12","W12","Autumn","Tributary","Abuqin River site","tributary",133.6116,46.17342
+"Autumn_W13","W13","Autumn","Tributary","Naoli River site","tributary",133.766,47.25273

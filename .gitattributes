@@ -1,0 +1,11 @@
+# Normalise line endings: store all text files as LF in the repository.
+* text=auto eol=lf
+
+*.R    text eol=lf
+*.md   text eol=lf
+*.csv  text eol=lf
+*.cff  text eol=lf
+*.txt  text eol=lf
+
+# Binary files (never alter line endings).
+*.docx binary

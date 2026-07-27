@@ -1,0 +1,109 @@
+# ======================================================================================================================
+# 04_simper_leaveout.R
+#
+# Drivers of the seasonal signal (Fig. S1, Tables S2-S4)
+# ------------------------------------------------------
+# SIMPER, leave-one-out PERMANOVA (chum salmon / autumn indicators / migratory taxa), IndVal.g indicator taxa, and
+# migratory read shares.
+#
+# 季节信号的驱动类群（图 S1，表 S2-S4）
+# -------------------------------------
+# SIMPER、留一 PERMANOVA（大麻哈鱼 / 秋季指示种 / 洄游类群）、IndVal.g 指示种、洄游读数占比。
+# ======================================================================================================================
+
+
+# --- Load shared setup ------------------------------------------------------------------------------------------------
+.args <- commandArgs(trailingOnly = FALSE)
+.file <- sub("^--file=", "", grep("^--file=", .args, value = TRUE))
+.dir  <- if (length(.file)) dirname(gsub("~\\+~", " ", .file)) else "."
+source(file.path(.dir, "00_setup.R"))
+set.seed(RANDOM_SEED)
+
+# Output files written by this script, plus a few analysis parameters.
+SIMPER_FILE    <- file.path(OUT_DIR, "TableS2_simper_top15.csv")
+LEAVEOUT_FILE  <- file.path(OUT_DIR, "TableS3_leaveout_permanova.csv")
+READSHARE_FILE <- file.path(OUT_DIR, "TableS4_migratory_readshare.csv")
+N_TOP_SIMPER   <- 15                     # SIMPER contributors to report
+AUTUMN_GROUP   <- 2L                     # IndVal.g cluster index for Autumn
+CHUM_SALMON    <- "Oncorhynchus_keta"    # the autumn-dominant chum salmon
+
+
+# --- SIMPER: top contributors to spring-autumn dissimilarity ----------------------------------------------------------
+simper_res <- summary(simper(rel, season, permutations = N_PERM_QUICK))[[1]]
+simper_res <- simper_res[order(-simper_res$average), ]
+top_contributors <- tibble(
+    taxon            = rownames(simper_res),
+    contribution_pct = round(100 * simper_res$average, PCT_DP),
+    cumulative_pct   = round(100 * cumsum(simper_res$average), PCT_DP)
+) |>
+    slice_head(n = N_TOP_SIMPER)
+cat(NL, "== SIMPER: top contributors to spring-autumn dissimilarity ==", NL, sep = "")
+print(as.data.frame(top_contributors), row.names = FALSE)
+write.csv(top_contributors, SIMPER_FILE, row.names = FALSE)
+
+
+# --- IndVal.g autumn indicator taxa -----------------------------------------------------------------------------------
+indval <- multipatt(as.data.frame(reads), season, func = "IndVal.g", control = how(nperm = N_PERM_QUICK))
+indval$sign$FDR   <- p.adjust(indval$sign$p.value, "BH")
+autumn_indicators <- rownames(indval$sign)[indval$sign$index == AUTUMN_GROUP & indval$sign$FDR < FDR_ALPHA]
+cat(glue("{NL}Autumn indicator taxa (IndVal.g, FDR < {FDR_ALPHA}): {length(autumn_indicators)}"), NL)
+
+
+# --- Migratory taxa (from the trait table) ----------------------------------------------------------------------------
+migratory <- traits$Species_code[traits$`Migration type` == "Migratory"]
+cat(glue("Migratory taxa (trait table): {length(migratory)}"), NL)
+
+
+# --- Leave-one-out PERMANOVA ------------------------------------------------------------------------------------------
+
+#' Season effect (PERMANOVA R2) after dropping a set of taxa. / 剔除若干类群后季节效应的 R2。
+#'
+#' Removes the given taxa, renormalises each site's surviving reads to proportions,
+#' and re-runs the Bray-Curtis PERMANOVA of composition against season.
+#'
+#' @param drop_taxa Character vector of taxon names to remove (default none).
+#' @return The season R2 from adonis2 for the reduced community.
+season_r2 <- function(drop_taxa = character()) {
+    kept_reads   <- rel[, !colnames(rel) %in% drop_taxa, drop = FALSE]
+    nonzero_rows <- rowSums(kept_reads) > 0
+    renormalised <- sweep(kept_reads[nonzero_rows, ], 1, rowSums(kept_reads[nonzero_rows, ]), "/")
+    adonis2(vegdist(renormalised, "bray") ~ season[nonzero_rows], permutations = N_PERM_QUICK)$R2[1]
+}
+
+full_r2 <- season_r2()
+leave_out <- tibble(
+    scenario = c("Full community", "Remove chum salmon (O. keta)",
+                 "Remove autumn indicator taxa", "Remove migratory taxa"),
+    removed  = c(0L, 1L, length(autumn_indicators), length(migratory)),
+    R2       = round(c(full_r2,
+                       season_r2(CHUM_SALMON),
+                       season_r2(autumn_indicators),
+                       season_r2(migratory)), STAT_DP)
+) |>
+    mutate(reduction_pct = round(100 * (full_r2 - R2) / full_r2, PCT_DP))
+cat(NL, "== Leave-one-out PERMANOVA ==", NL, sep = "")
+print(as.data.frame(leave_out), row.names = FALSE)
+write.csv(leave_out, LEAVEOUT_FILE, row.names = FALSE)
+
+
+# --- Migratory and chum-salmon read share by season -------------------------------------------------------------------
+
+#' Percentage of each season's reads belonging to a set of taxa. / 各季节归属某类群集合的读数占比。
+#'
+#' @param taxa Character vector of taxon names.
+#' @return Numeric vector of two percentages, c(Spring, Autumn).
+read_share <- function(taxa) {
+    map_dbl(SEASONS, \(season_name) {
+        season_reads <- reads[season == season_name, , drop = FALSE]
+        100 * sum(season_reads[, colnames(season_reads) %in% taxa]) / sum(season_reads)
+    })
+}
+
+share <- tibble(
+    season          = SEASONS,
+    migratory_pct   = round(read_share(migratory), PCT_DP),
+    chum_salmon_pct = round(read_share(CHUM_SALMON), STAT_DP)
+)
+cat(NL, "== Migratory read share ==", NL, sep = "")
+print(as.data.frame(share), row.names = FALSE)
+write.csv(share, READSHARE_FILE, row.names = FALSE)

@@ -1,0 +1,19 @@
+# --- Generated analysis outputs (recreated by code/run_all.R) ---------------------------------------------------------
+outputs/
+
+# --- Internal working notes and provenance scripts (not part of the public release) -----------------------------------
+internal_processes/
+
+# --- R / RStudio ------------------------------------------------------------------------------------------------------
+.Rproj.user/
+.Rhistory
+.RData
+.Rapp.history
+.Ruserdata
+*.Rproj
+
+# --- OS / editor cruft ------------------------------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+*~
+*.swp

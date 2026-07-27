@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this code or data, please cite the associated article and this repository."
+title: "Ussuri River freshwater-fish eDNA: analysis code and data"
+abstract: >-
+  Reproducible analysis code and derived data for a 12S environmental-DNA metabarcoding study of the
+  freshwater fish community of the Ussuri River (Amur basin), covering composition, alpha and beta
+  diversity, taxonomic-functional coupling, and the longitudinal hydro-geographic gradient.
+type: dataset
+authors:
+  - family-names: Li
+    given-names: Ruiyi
+  - family-names: Li
+    given-names: Peilun
+  - family-names: Liu
+    given-names: Jiacheng
+  - family-names: Xiong
+    given-names: Shuhan
+  - family-names: Wang
+    given-names: Jilong
+    email: wangjilong@hrfri.ac.cn
+repository-code: "https://github.com/liruiyi2002/heilongjiang-rivers-fish-analysis"
+license: CC-BY-NC-4.0
+version: "1.0.0"
+date-released: "2026-07-27"
