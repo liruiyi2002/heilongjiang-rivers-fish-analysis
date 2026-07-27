@@ -36,17 +36,17 @@ Rscript code/03_beta_diversity.R
 
 ## Scripts
 
-| File | What it does | Manuscript |
-|------|--------------|-----------|
-| `00_setup.R` | Shared setup: attaches/installs packages, loads all data, builds derived matrices, and defines the configuration constants. Sourced by every other script. | — |
-| `01_composition.R` | Total reads; order/family/genus counts; seasonal shared/unique taxa; replicate-level sample coverage; dominant taxa. | Results 3.1, Fig. 2 |
-| `02_alpha_diversity.R` | Taxonomic and functional alpha diversity; seasonal paired Wilcoxon tests (BH-FDR). Writes the alpha table used by 05–07. | Fig. 3, Table S1 |
-| `03_beta_diversity.R` | Bray–Curtis PERMANOVA, betadisper, PCoA; turnover/nestedness partitioning (+ betapart template). | Fig. 4 |
-| `04_simper_leaveout.R` | SIMPER; leave-one-out PERMANOVA; IndVal.g indicators; migratory read shares. | Fig. S1, Tables S2–S4 |
-| `05_taxonomy_function.R` | Taxonomic–functional coupling: Spearman (alpha) and Mantel (beta). | Fig. 5, Tables S5–S6 |
-| `06_environment_gradient.R` | PCA of hydro-geographic variables; alpha vs PC1; composition vs PC1; dbRDA; Mantel / partial Mantel; spatial beta among sections. | Figs 6–8, Table S7 |
-| `07_water_quality_supp.R` | Supplementary water-quality vs alpha-diversity correlations (land-use not included). | Fig. S2 (part) |
-| `run_all.R` | Runs `01`–`07` in order. | — |
+| File                        | What it does                                                               | Manuscript            |
+| --------------------------- | -------------------------------------------------------------------------- | --------------------- |
+| `00_setup.R`                | Load data, build matrices, attach/install packages, define constants.      | (sourced by all)      |
+| `01_composition.R`          | Reads, order/family/genus counts, shared/unique taxa, coverage, dominants. | Results 3.1, Fig. 2   |
+| `02_alpha_diversity.R`      | Taxonomic and functional alpha; seasonal paired Wilcoxon (BH-FDR).         | Fig. 3, Table S1      |
+| `03_beta_diversity.R`       | PERMANOVA, betadisper, PCoA; turnover/nestedness partition.                | Fig. 4                |
+| `04_simper_leaveout.R`      | SIMPER; leave-one-out PERMANOVA; IndVal.g; migratory read share.           | Fig. S1, Tables S2-S4 |
+| `05_taxonomy_function.R`    | Taxonomy-function coupling: Spearman (alpha), Mantel (beta).               | Fig. 5, Tables S5-S6  |
+| `06_environment_gradient.R` | PCA; alpha vs PC1; composition vs PC1; dbRDA; Mantel/partial Mantel.       | Figs 6-8, Table S7    |
+| `07_water_quality_supp.R`   | Water quality vs alpha diversity (supplementary; land use not included).   | Fig. S2 (part)        |
+| `run_all.R`                 | Run 01-07 in order.                                                        | -                     |
 
 ## Configuration
 
@@ -67,8 +67,8 @@ locally, e.g. `N_PCOA_AXES` (02), `N_TOP_SIMPER` / `AUTUMN_GROUP` / `CHUM_SALMON
 
 ## Inputs and outputs
 
-- **Inputs:** the CSVs in [`../data/`](../data) — see `../DATA_PROVENANCE.docx` for what each one is and
-  where it came from.
+- **Inputs:** the CSVs in [`../data/`](../data) — see [`../data/README.md`](../data/README.md) for what
+  each one is and where it came from.
 - **Outputs:** written to `../outputs/` (created automatically): `alpha_diversity_site_level.csv`,
   `Table_top_abundant_taxa.csv`, `Fig2_seasonal_occurrence.csv`, `beta_partition_taxonomic.csv`,
   `alpha_vs_PC1.csv`, and `TableS1`–`TableS8`.
@@ -83,5 +83,8 @@ locally, e.g. `N_PCOA_AXES` (02), `N_TOP_SIMPER` / `AUTUMN_GROUP` / `CHUM_SALMON
 
 ## License
 
-Released under CC BY-NC 4.0 (attribution, non-commercial) — see [`../LICENSE`](../LICENSE).
+Dual-licensed (both attribution + non-commercial): **code** under the PolyForm Noncommercial License
+1.0.0 ([`../LICENSE-CODE`](../LICENSE-CODE)); **data and docs** under CC BY-NC 4.0
+([`../LICENSE-DATA`](../LICENSE-DATA)); summary in [`../LICENSE`](../LICENSE). To cite, see
+`../CITATION.cff` (or `../CITATION.bib` for BibTeX/LaTeX).
 Repository: <https://github.com/liruiyi2002/heilongjiang-rivers-fish-analysis>.

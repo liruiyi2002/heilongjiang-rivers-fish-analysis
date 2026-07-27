@@ -14,12 +14,13 @@ tables in [`data/`](data), with no internet access or raw sequence reads require
 ```
 .
 ├── code/                 # analysis scripts 00–07 + run_all.R  (see code/README.md)
-├── data/                 # input CSVs + DATA_PROVENANCE.docx (what each file is and where it came from)
+├── data/                 # input CSVs + README.md (data provenance: what each file is, where it's from)
 ├── outputs/              # tables written by the scripts  (generated; not tracked in git)
 ├── README.md             # this file
-├── README.docx           # the same overview as a Word document (for journal submission)
-├── LICENSE               # CC BY-NC 4.0
-└── CITATION.cff          # how to cite
+├── CITATION.cff          # how to cite  (also CITATION.bib for BibTeX/LaTeX)
+├── LICENSE               # dual-license summary
+├── LICENSE-CODE          # PolyForm Noncommercial 1.0.0  (applies to code/)
+└── LICENSE-DATA          # CC BY-NC 4.0                   (applies to data/ and docs)
 ```
 
 ## Requirements
@@ -44,8 +45,8 @@ first. See [`code/README.md`](code/README.md) for a per-script guide and the con
 
 ## Data
 
-The input tables live in [`data/`](data); **`data/DATA_PROVENANCE.docx`** documents each file and its
-source. In brief: the site-by-species read table is the summed field replicates; the replicate-level
+The input tables live in [`data/`](data); **[`data/README.md`](data/README.md)** documents each file
+and its source. In brief: the site-by-species read table is the summed field replicates; the replicate-level
 table, species taxonomy, and water-quality table derive from the sequencing provider's deliveries and
 field measurements; the trait and hydro-geographic environment tables are compiled from FishBase, the
 primary literature, and open datasets (HydroRIVERS, Copernicus GLO-90 DEM, NASA POWER, ESA WorldCover).
@@ -55,10 +56,16 @@ NCBI Sequence Read Archive (see the manuscript's data-availability statement for
 
 ## Citation
 
-Please cite the associated article together with this repository — see [`CITATION.cff`](CITATION.cff).
+Please cite the associated article together with this repository — see [`CITATION.cff`](CITATION.cff),
+or [`CITATION.bib`](CITATION.bib) for a BibTeX/LaTeX entry.
 
 ## License
 
-Code, data, and documentation are released under the **Creative Commons Attribution-NonCommercial 4.0
-International License (CC BY-NC 4.0)** — free to share and adapt **with attribution** and **for
-non-commercial purposes**. See [`LICENSE`](LICENSE).
+This repository is **dual-licensed**, both requiring attribution and permitting non-commercial use only:
+
+- **Code** (`code/`) — [PolyForm Noncommercial License 1.0.0](LICENSE-CODE).
+- **Data and documentation** (`data/`, `outputs/`, and the docs) — [Creative Commons
+  Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)](LICENSE-DATA).
+
+See [`LICENSE`](LICENSE) for the summary and [`CITATION.cff`](CITATION.cff) / [`CITATION.bib`](CITATION.bib)
+for how to attribute.

@@ -1,0 +1,36 @@
+Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)
+
+Copyright (c) 2026 Ruiyi Li, Peilun Li, Jiacheng Liu, Shuhan Xiong and Jilong Wang.
+
+The DATA and DOCUMENTATION in this repository -- the CSV files in `data/`, the tables generated in
+`outputs/`, and the accompanying documentation -- are licensed under the Creative Commons
+Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0). The source code is licensed
+separately under the PolyForm Noncommercial License 1.0.0 (see LICENSE-CODE).
+
+You are free to:
+
+  * Share  -- copy and redistribute the material in any medium or format.
+  * Adapt  -- remix, transform, and build upon the material.
+
+Under the following terms:
+
+  * Attribution -- You must give appropriate credit (see "How to attribute" below), provide a link to
+    this license, and indicate if changes were made.
+  * NonCommercial -- You may not use the material for commercial purposes.
+  * No additional restrictions -- You may not apply legal terms or technological measures that legally
+    restrict others from doing anything the license permits.
+
+This is a human-readable summary of (and not a substitute for) the license. The full, legally binding
+text of CC BY-NC 4.0 is incorporated here by reference and is available at:
+
+  Full legal code:     https://creativecommons.org/licenses/by-nc/4.0/legalcode
+  Human-readable deed: https://creativecommons.org/licenses/by-nc/4.0/
+
+How to attribute:
+
+  Please cite the associated publication (see CITATION.cff, or CITATION.bib for a BibTeX/LaTeX entry)
+  together with this repository:
+
+  Li R, Li P, Liu J, Xiong S, Wang J. Longitudinal environmental gradients shape fish community
+  composition rather than local alpha diversity in the Ussuri River (analysis code and data).
+  https://github.com/liruiyi2002/heilongjiang-rivers-fish-analysis
