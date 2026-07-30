@@ -11,7 +11,9 @@
 ```
 .
 ├── code/                 # 分析脚本 00–07 + run_all.R（见 code/README.md）
+│   └── map_generator/      # 图 1 研究区域地图（Python + Pillow；见其 README）
 ├── data/                 # 输入 CSV + README.md（数据溯源：各文件的内容与来源）
+│   └── geo/              # 图 1 所用底图裁剪子集（见 geo/SOURCES.md）
 ├── outputs/              # 脚本生成的结果表（自动生成；不纳入 git）
 ├── README.md             # 英文说明
 ├── README.zh-CN.md       # 本文件（中文说明）

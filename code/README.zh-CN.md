@@ -10,6 +10,8 @@
 ## 环境要求
 
 - **R ≥ 4.1**（原生 `|>` 管道；已在 4.3.3 上测试）。
+- 仅图 1 需要：**Python ≥ 3.12** 与 Pillow —— 见
+  [`map_generator/README.zh-CN.md`](map_generator/README.zh-CN.md)。R 流程本身无需 Python。
 - 首次运行时由 `00_setup.R` **自动安装**缺失的包：`vegan`、`FD`、`iNEXT`、`indicspecies`、`cluster`、
   `dplyr`、`tidyr`、`purrr`、`stringr`、`glue`。
 - 可选：`betapart`。若未安装，脚本 `03` 会为功能 beta 多样性分解打印可直接运行的模板，其余结果照常运行。
@@ -43,6 +45,7 @@ Rscript code/03_beta_diversity.R
 | `06_environment_gradient.R` | PCA；alpha 对 PC1；组成对 PC1；dbRDA；Mantel/偏 Mantel。 | 图 6-8、表 S7      |
 | `07_water_quality_supp.R`   | 水质与 alpha 多样性（附加分析；不含土地利用）。          | 图 S2（部分）      |
 | `run_all.R`                 | 依次运行 01-07。                                         | -                  |
+| `map_generator/`            | 图 1（研究区域 + 河网位置）。**Python**，见其 README。    | 图 1               |
 
 ## 配置
 

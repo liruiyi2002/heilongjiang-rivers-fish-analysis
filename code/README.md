@@ -11,6 +11,8 @@ No internet or raw sequence reads are needed (only a one-off package install on 
 ## Requirements
 
 - **R ≥ 4.1** (for the native `|>` pipe; tested on 4.3.3).
+- Figure 1 only: **Python ≥ 3.12** with Pillow — see
+  [`map_generator/README.md`](map_generator/README.md). The R pipeline does not need it.
 - Packages, **installed automatically** by `00_setup.R` if missing: `vegan`, `FD`, `iNEXT`,
   `indicspecies`, `cluster`, `dplyr`, `tidyr`, `purrr`, `stringr`, `glue`.
 - **Optional:** `betapart`. Script `03` prints a ready-to-run template for the functional
@@ -46,6 +48,7 @@ Rscript code/03_beta_diversity.R
 | `06_environment_gradient.R` | PCA; alpha vs PC1; composition vs PC1; dbRDA; Mantel/partial Mantel.       | Figs 6-8, Table S7    |
 | `07_water_quality_supp.R`   | Water quality vs alpha diversity (supplementary; land use not included).   | Fig. S2 (part)        |
 | `run_all.R`                 | Run 01-07 in order.                                                        | -                     |
+| `map_generator/`            | Figure 1 (study area + river-network position). **Python**; see its README. | Fig. 1                |
 
 ## Configuration
 

@@ -1,5 +1,7 @@
 # Ussuri River freshwater-fish eDNA — analysis code and data
 
+**English** · [中文](README.zh-CN.md)
+
 Reproducible R code and derived data for a 12S environmental-DNA (eDNA) metabarcoding study of the
 freshwater fish community of the **Ussuri River** (a large transboundary tributary of the Amur /
 Heilongjiang). The scripts reproduce every result in the manuscript — community composition, alpha and
@@ -14,7 +16,9 @@ tables in [`data/`](data), with no internet access or raw sequence reads require
 ```
 .
 ├── code/                 # analysis scripts 00–07 + run_all.R  (see code/README.md)
+│   └── map_generator/      # Figure 1 study-area map  (Python + Pillow; see its README)
 ├── data/                 # input CSVs + README.md (data provenance: what each file is, where it's from)
+│   └── geo/              # clipped basemap extracts for Figure 1  (see geo/SOURCES.md)
 ├── outputs/              # tables written by the scripts  (generated; not tracked in git)
 ├── README.md             # this file
 ├── CITATION.cff          # how to cite  (also CITATION.bib for BibTeX/LaTeX)
