@@ -2,7 +2,7 @@
 Collision-avoiding label placement and the post-render audit.
 
 Author:     Pouria Hadjibagheri
-Email:      pouria.hadjibagheri@partners-cap.com
+Email:      p.bagheri@ucl.ac.uk
 Copyright:  (c) 2026 Pouria Hadjibagheri
 License:    PolyForm Noncommercial 1.0.0 (attribution required, noncommercial use only)
 """
@@ -30,6 +30,7 @@ __all__ = [
     "Rectangle",
     "report_audit",
 ]
+
 
 # Labels are held this far inside the panel edge. Text flush against a trimmed edge reads as a printing error even
 # when it is technically inside the frame.

@@ -2,7 +2,7 @@
 Drawing primitives and map furniture.
 
 Author:     Pouria Hadjibagheri
-Email:      pouria.hadjibagheri@partners-cap.com
+Email:      p.bagheri@ucl.ac.uk
 Copyright:  (c) 2026 Pouria Hadjibagheri
 License:    PolyForm Noncommercial 1.0.0 (attribution required, noncommercial use only)
 """
@@ -40,6 +40,7 @@ __all__ = [
     "draw_polyline",
     "draw_scale_bar",
 ]
+
 
 # A ring needs three points to enclose an area and a line needs two to have direction; anything shorter is a
 # degenerate fragment from a clipped extract and is skipped rather than drawn as a dot.

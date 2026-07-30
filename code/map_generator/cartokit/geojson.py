@@ -2,7 +2,7 @@
 Minimal GeoJSON reader for committed basemap extracts.
 
 Author:     Pouria Hadjibagheri
-Email:      pouria.hadjibagheri@partners-cap.com
+Email:      p.bagheri@ucl.ac.uk
 Copyright:  (c) 2026 Pouria Hadjibagheri
 License:    PolyForm Noncommercial 1.0.0 (attribution required, noncommercial use only)
 """
@@ -34,8 +34,10 @@ __all__ = [
     "polygon_rings",
 ]
 
+
 type Position = tuple[float, float]
 type Ring = list[Position]
+
 
 # Natural Earth spells its name field in upper case while OpenStreetMap uses lower case, so both are accepted and
 # the caller never has to know which source a feature came from.

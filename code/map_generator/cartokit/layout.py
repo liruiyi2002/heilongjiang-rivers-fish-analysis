@@ -2,7 +2,7 @@
 Physical-unit geometry and typography for a declared print size.
 
 Author:     Pouria Hadjibagheri
-Email:      pouria.hadjibagheri@partners-cap.com
+Email:      p.bagheri@ucl.ac.uk
 Copyright:  (c) 2026 Pouria Hadjibagheri
 License:    PolyForm Noncommercial 1.0.0 (attribution required, noncommercial use only)
 """
@@ -29,6 +29,7 @@ __all__ = [
     "FigureMetrics",
     "FontWeight",
 ]
+
 
 _MILLIMETRES_PER_INCH = 25.4
 _POINTS_PER_INCH = 72.0

@@ -2,7 +2,7 @@
 Map projection, pixel viewport, and ground-distance helpers.
 
 Author:     Pouria Hadjibagheri
-Email:      pouria.hadjibagheri@partners-cap.com
+Email:      p.bagheri@ucl.ac.uk
 Copyright:  (c) 2026 Pouria Hadjibagheri
 License:    PolyForm Noncommercial 1.0.0 (attribution required, noncommercial use only)
 """
@@ -30,6 +30,7 @@ __all__ = [
     "Viewport",
     "ground_distance_km",
 ]
+
 
 EARTH_RADIUS_KM = 6371.0
 

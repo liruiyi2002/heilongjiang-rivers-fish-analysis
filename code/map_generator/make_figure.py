@@ -23,6 +23,27 @@ How the figure is assembled
     what smooths the primitives; Pillow itself does not antialias.
 5.  `report_audit` re-checks both registries and the requested font sizes, and `main` turns the verdict
     into an exit code so a broken figure fails a build rather than shipping quietly.
+
+绘制稿件图 1
+-----------
+面板 (a) 为研究河段及 13 个 eDNA 采样点；面板 (b) 按各点距乌苏里江—阿穆尔河汇口的距离展示其在河网中的
+位置。采样点记录来自 `data/site_metadata.csv` 与 `data/site_environment.csv`；底图来自 `data/geo` 中的
+裁剪子集，其来源与许可记录于 `data/geo/SOURCES.md`。
+
+尺寸通过 `cartokit` 以物理单位声明，因此输出天然符合印刷插图规范；每条标注均经冲突登记表放置，并在渲染
+后接受审计。
+
+成图流程
+--------
+1.  `load_sampling_sites` 一次性读入 13 个采样点，将两张研究数据表合并为每点一条记录。
+2.  `StudyAreaPanel` 将面板 (a) 渲染到独立图像中。图层自后向前依次为：陆地、水系、图面要素（定位小图、
+    比例尺、指北针），最后是采样点。在绘制任何装饰性内容之前先登记标记的占位框，因此经纬网或城镇标注
+    总是让位于数据标记，而非相反。
+3.  `render_figure` 将该面板贴入整幅画布，在第二个登记表中占位，并把剩余宽度交给 `draw_network_panel`
+    绘制面板 (b)。
+4.  画布以输出尺寸的 `supersample` 倍绘制，最后一次性缩减取样，以此实现抗锯齿；Pillow 自身不做抗锯齿。
+5.  `report_audit` 复核两个登记表与所请求的字号，`main` 将结论转为退出码，使有缺陷的图在构建时报错，
+    而不是悄然发布。
 """
 
 # Python imports
@@ -35,7 +56,6 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 from pathlib import Path
 
-
 # Third party imports
 # ============================
 from PIL import Image, ImageDraw
@@ -47,7 +67,6 @@ from cartokit import drawing, geojson, geometry, labels, layout
 
 # Paths
 # -----
-
 _SCRIPT_DIR = Path(__file__).resolve().parent
 _REPOSITORY_DIR = _SCRIPT_DIR.parents[1]
 
@@ -81,7 +100,6 @@ _SUPERSAMPLE_PRINT = 2
 
 # Map geometry
 # ------------
-
 _MAP_EXTENT = (132.95, 45.28, 135.10, 48.52)
 _LOCATOR_EXTENT = (99.0, 27.0, 143.0, 55.5)
 _MAP_PROJECTION = (134.0, 47.0, 45.6, 48.4)
@@ -113,7 +131,6 @@ _CHINA = "China"
 # -------
 # The three section hues are the leading slots of a colourblind-validated categorical order. Marker shape repeats
 # the same distinction, so section identity never rests on colour alone.
-
 
 class RiverSection(StrEnum):
     """Identifies the three reaches the sampling design distinguishes."""
