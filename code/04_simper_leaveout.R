@@ -31,13 +31,21 @@ CHUM_SALMON    <- "Oncorhynchus_keta"    # the autumn-dominant chum salmon
 # --- SIMPER: top contributors to spring-autumn dissimilarity ----------------------------------------------------------
 simper_res <- summary(simper(rel, season, permutations = N_PERM_QUICK))[[1]]
 simper_res <- simper_res[order(-simper_res$average), ]
+
+# vegan returns each taxon's average contribution in dissimilarity units, and those contributions sum to the mean
+# Bray-Curtis dissimilarity between the seasons. A taxon's percentage contribution is therefore its share of that
+# total, which is the quantity SIMPER results are conventionally reported as. Multiplying the raw average by 100
+# would give a number on the wrong scale.
+overall_dissimilarity <- sum(simper_res$average)
+simper_res$share_pct  <- 100 * simper_res$average / overall_dissimilarity
 top_contributors <- tibble(
     taxon            = rownames(simper_res),
-    contribution_pct = round(100 * simper_res$average, PCT_DP),
-    cumulative_pct   = round(100 * cumsum(simper_res$average), PCT_DP)
+    contribution_pct = round(simper_res$share_pct, PCT_DP),
+    cumulative_pct   = round(cumsum(simper_res$share_pct), PCT_DP)
 ) |>
     slice_head(n = N_TOP_SIMPER)
 cat(NL, "== SIMPER: top contributors to spring-autumn dissimilarity ==", NL, sep = "")
+cat(glue("Mean Bray-Curtis dissimilarity between seasons: {round(overall_dissimilarity, STAT_DP)}"), NL)
 print(as.data.frame(top_contributors), row.names = FALSE)
 write.csv(top_contributors, SIMPER_FILE, row.names = FALSE)
 

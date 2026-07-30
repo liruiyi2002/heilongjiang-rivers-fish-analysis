@@ -69,10 +69,26 @@ incidence_frequencies <- function(season_name) {
     c(nrow(season_replicates), sort(taxon_incidence[taxon_incidence > 0], decreasing = TRUE))
 }
 
-coverage <- setNames(map(SEASONS, incidence_frequencies), SEASONS) |>
-    iNEXT(q = 0, datatype = "incidence_freq")
+frequencies <- setNames(map(SEASONS, incidence_frequencies), SEASONS)
+coverage    <- iNEXT(frequencies, q = 0, datatype = "incidence_freq")
 cat(NL, "Sample coverage (incidence-based, replicate scale):", NL, sep = "")
 print(coverage$DataInfo[, c("Assemblage", "SC")])
+
+# Observed richness as a share of the Chao asymptotic estimate. Coverage says how much of the community's
+# abundance was sampled; this says how much of its richness was, which is the quantity the manuscript quotes.
+completeness <- map(SEASONS, \(season_name) {
+    estimate <- ChaoRichness(frequencies[[season_name]], datatype = "incidence_freq")
+    tibble(
+        season         = season_name,
+        observed       = sum(frequencies[[season_name]][-1] > 0),
+        chao_estimate  = round(estimate$Estimator, STAT_DP),
+        observed_pct   = round(100 * sum(frequencies[[season_name]][-1] > 0) / estimate$Estimator, PCT_DP)
+    )
+}) |>
+    bind_rows()
+
+cat(NL, "Observed richness as a share of the Chao asymptotic estimate:", NL, sep = "")
+print(as.data.frame(completeness), row.names = FALSE)
 
 
 # --- Most sequence-abundant taxa per season ---------------------------------------------------------------------------

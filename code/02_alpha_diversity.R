@@ -21,7 +21,13 @@ source(file.path(.dir, "00_setup.R"))
 
 # Output file written by this script (ALPHA_SITE_FILE is defined in 00_setup.R).
 PAIRED_TESTS_FILE <- file.path(OUT_DIR, "TableS1_alpha_paired_tests_site_level.csv")
-N_PCOA_AXES       <- 4   # PCoA axes retained for the functional-diversity indices
+# PCoA axes retained for the functional-diversity indices. Chosen from the data rather than by convention,
+# following Maire et al. (2015): the number of axes is the one minimising the deviation between the trait-based
+# Gower distance and the Euclidean distance in the reduced space. Five axes minimise both the mean absolute
+# deviation (0.057) and the mean squared deviation (0.0052, comfortably inside the 0.01 benchmark for a
+# high-quality space) and retain 72.2% of the trait variation. Every site holds 63-82 taxa, far more than five,
+# so the convex hull underlying FRic is well defined. See internal_processes/choose_pcoa_axes.R.
+N_PCOA_AXES       <- 5
 
 
 # --- Taxonomic alpha diversity per site-season ------------------------------------------------------------------------
