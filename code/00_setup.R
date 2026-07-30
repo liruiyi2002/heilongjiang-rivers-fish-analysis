@@ -53,7 +53,8 @@ SPECIES_TRAITS_FILE   <- "species_traits.csv"
 SPECIES_TAXONOMY_FILE <- "species_taxonomy.csv"
 GOWER_DIST_FILE       <- "gower_distance.csv"
 SITE_ENV_FILE         <- "site_environment.csv"
-WATER_QUALITY_FILE    <- "site_water_quality.csv"
+WATER_QUALITY_FILE    <- "site_water_quality_seasonal.csv"
+LAND_USE_FILE         <- "site_land_use.csv"
 ALPHA_SITE_FILE       <- file.path(OUT_DIR, "alpha_diversity_site_level.csv")  # written by 02, read by 05-07
 
 
@@ -134,13 +135,22 @@ gower_dist <- read_data(GOWER_DIST_FILE, row.names = 1) |>
 
 # --- Environment ------------------------------------------------------------------------------------------------------
 # Hydro-geographic descriptors (13 sites) drive the main gradient analysis
-# (Figs 6-8); the water-quality set (8 vars) backs the supplementary Fig. S2 only.
+# (Figs 6-8); water quality and land cover back the supplementary Fig. S2 only.
 env <- read_data(SITE_ENV_FILE, stringsAsFactors = FALSE)
 rownames(env) <- env$site
 ENV_VARS <- c("elev_m", "strahler", "log_drainage", "log_discharge", "log_width",
               "grad_dem", "dist_source_km", "dist_mouth_km", "MAT_C", "MAP_mm")
 
-water_quality <- read_data(WATER_QUALITY_FILE, row.names = 1)
+# Water quality is measured once per site AND season, so it is kept long and joined on both keys.
+water_quality      <- read_data(WATER_QUALITY_FILE, stringsAsFactors = FALSE)
+WATER_QUALITY_VARS <- c("temperature_C", "pH", "conductivity_uS_cm", "dissolved_oxygen_mg_L",
+                        "total_phosphorus_mg_L", "total_nitrogen_mg_L", "ammonia_nitrogen_mg_L")
+
+# Land cover is a fixed site property (shares of the classified area in a 2 km buffer), so one row per site.
+# The pixel count and buffer area travel with the table for transparency but are not analysis variables.
+land_use      <- read_data(LAND_USE_FILE, row.names = 1)
+LAND_USE_VARS <- c("cropland", "forest", "shrub", "grassland", "water", "snow_ice", "barren",
+                   "impervious", "wetland")
 
 
 # --- Per-season community and the site environment aligned to it ------------------------------------------------------
