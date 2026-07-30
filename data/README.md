@@ -18,7 +18,10 @@ counts are integers.
 | `gower_distance.csv`             | 100 x 100 Gower distance among taxa; computed from species_traits.csv.           |
 | `site_environment.csv`           | 13 sites x hydro-geographic variables + PC1-PC3; from open datasets.             |
 | `site_metadata.csv`              | 26 site-seasons: site, season, river section, name, channel type, coords.        |
-| `site_water_quality.csv`         | 13 sites x 8 water-quality variables (field/lab); supports Fig. S2 only.         |
+| `site_water_quality.csv`         | 13 sites x 8 water-quality variables; **spring only** - see the note below.      |
+| `site_water_quality_seasonal.csv` | 26 site-seasons x 7 variables incl. ammonia nitrogen; the authors' field/lab table. |
+| `site_land_use.csv`              | 13 sites x 9 CLCD land-cover shares in a 2 km buffer, plus the pixel count.      |
+| `geo/`                           | Clipped basemap extracts for Figure 1 - see [`geo/SOURCES.md`](geo/SOURCES.md).  |
 
 ## How the community data were assembled
 
@@ -32,6 +35,23 @@ spring one. The summed replicates reproduce the site-level table exactly (max di
 Raw FASTQ sequence reads are **not** included here; they are to be deposited in the NCBI Sequence Read
 Archive and cited in the manuscript. The upstream bioinformatics (reads -> species table) was run by
 the sequencing provider and is outside this package.
+
+## Environmental data
+
+**Water quality.** `site_water_quality_seasonal.csv` holds the authors' own measurements for both
+seasons: water temperature, pH, conductivity, dissolved oxygen, total phosphorus, total nitrogen and
+ammonia nitrogen. Field variables were read with a YSI ProQuatro meter; nutrients were determined in
+the laboratory. Use this file in preference to `site_water_quality.csv`, which is retained for
+continuity but contains **spring values only** (it also carries hardness and transparency, which are
+not part of the authors' table, and lacks ammonia).
+
+**Land cover.** `site_land_use.csv` gives the share of each of the nine CLCD classes within a **2 km
+buffer** of every site, computed from the original per-class pixel counts (CLCD 30 m; Yang & Huang,
+2021). The buffer radius is confirmed by the counts themselves: the five inland tributary buffers
+each cover 12.55 km², against pi x 2^2 = 12.57 km². CLCD covers China only, so buffers at the eight
+border sites are clipped at the channel (5.4-8.8 km²); shares are therefore of the **classified**
+area, and `classified_pixels` and `buffer_area_km2` are included so this is explicit. Land cover is a
+fixed site property and does not vary between seasons. Snow/ice is zero at every site.
 
 ## Taxon naming
 

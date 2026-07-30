@@ -17,7 +17,10 @@
 | `gower_distance.csv`             | 100 x 100 类群间 Gower 距离；由 species_traits.csv 计算。      |
 | `site_environment.csv`           | 13 站点 x 水文-地理变量与 PC1-PC3；源自开放数据集。            |
 | `site_metadata.csv`              | 26 站点-季节：站点、季节、河段、名称、河道类型、坐标。         |
-| `site_water_quality.csv`         | 13 站点 x 8 项水质变量（野外/实验室）；仅支撑图 S2。           |
+| `site_water_quality.csv`         | 13 站点 x 8 项水质变量；**仅春季**——见下文说明。               |
+| `site_water_quality_seasonal.csv` | 26 站点-季节 x 7 项变量（含氨氮）；作者的野外/实验室数据表。   |
+| `site_land_use.csv`              | 13 站点 x 9 类 CLCD 土地覆被比例（2 km 缓冲区）及像元计数。    |
+| `geo/`                           | 图 1 所用底图裁剪子集——见 [`geo/SOURCES.zh-CN.md`](geo/SOURCES.zh-CN.md)。 |
 
 ## 群落数据的构建
 
@@ -28,6 +31,19 @@
 
 原始 FASTQ 测序数据**不**包含于此；将提交至 NCBI 序列读取档案库（SRA）并在稿件中引用。上游生物信息学分析
 （读数 → 物种表）由测序公司完成，不属于本包。
+
+## 环境数据
+
+**水质。** `site_water_quality_seasonal.csv` 收录作者两个季节的实测数据：水温、pH、电导率、溶解氧、
+总磷、总氮与氨氮。野外指标使用 YSI ProQuatro 水质仪测定，营养盐于实验室测定。请优先使用该文件；
+`site_water_quality.csv` 为保持连续性而保留，但**仅含春季数值**（其另有硬度与透明度两项，不属于作者
+数据表，且缺少氨氮）。
+
+**土地覆被。** `site_land_use.csv` 给出各站点 **2 km 缓冲区**内 CLCD 九个类别的比例，由原始分类像元
+计数计算（CLCD 30 m；Yang & Huang, 2021）。缓冲半径由计数本身确认：五个内陆支流缓冲区各覆盖
+12.55 km²，而 pi x 2^2 = 12.57 km²。CLCD 仅覆盖中国境内，因此八个界河站点的缓冲区在河道处被截断
+（5.4–8.8 km²）；比例系相对于**已分类**面积，故一并给出 `classified_pixels` 与 `buffer_area_km2`
+以明确说明。土地覆被为站点固有属性，不随季节变化。各站点冰雪类别均为 0。
 
 ## 类群命名
 
