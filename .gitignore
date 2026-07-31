@@ -1,5 +1,8 @@
-# --- Generated analysis outputs (recreated by code/run_all.R) ---------------------------------------------------------
+# --- Generated analysis outputs and artwork (recreated by code/run_all.R) ---------------------------------------------
+# Both are reproducible from data/ and code/, so they are not tracked. figures/ holds the submission TIFF, PNG and PDF
+# for every figure; re-run the pipeline to rebuild it.
 outputs/
+figures/
 
 # --- Internal working notes and provenance scripts (not part of the public release) -----------------------------------
 internal_processes/

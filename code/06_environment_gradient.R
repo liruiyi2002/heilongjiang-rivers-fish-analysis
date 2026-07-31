@@ -21,10 +21,25 @@
 source(file.path(.dir, "00_setup.R"))
 set.seed(RANDOM_SEED)
 
-# Output files written by this script (ALPHA_SITE_FILE is defined in 00_setup.R).
+# Output files written by this script (ALPHA_SITE_FILE is defined in 00_setup.R). The Fig. 6-8 files carry the
+# plot-ready ordination coordinates, arrow coordinates and pair lists, so each figure is drawn from the same numbers
+# this script reports rather than from a second, independent computation.
 ALPHA_PC1_FILE <- file.path(OUT_DIR, "alpha_vs_PC1.csv")
 SECTIONS_FILE  <- file.path(OUT_DIR, "TableS7_spatial_sections.csv")
+PCA_SCORES_FILE    <- file.path(OUT_DIR, "Fig6_pca_scores.csv")
+PCA_LOADINGS_FILE  <- file.path(OUT_DIR, "Fig6_pca_loadings.csv")
+PCA_VARIANCE_FILE  <- file.path(OUT_DIR, "Fig6_pca_variance.csv")
+DBRDA_SCORES_FILE  <- file.path(OUT_DIR, "Fig7_dbrda_scores.csv")
+DBRDA_ARROWS_FILE  <- file.path(OUT_DIR, "Fig7_dbrda_arrows.csv")
+DBRDA_STATS_FILE   <- file.path(OUT_DIR, "Fig7_dbrda_stats.csv")
+ENV_PAIRS_FILE     <- file.path(OUT_DIR, "Fig8_env_pairs.csv")
+MANTEL_STATS_FILE  <- file.path(OUT_DIR, "Fig8_mantel_stats.csv")
+
 EARTH_RADIUS_KM <- 6371   # mean Earth radius, for the haversine distance
+
+# The hydro-geographic predictors entered into the dbRDA, kept in one place because both the model and its arrow
+# labels are built from it.
+DBRDA_VARS <- c("elev_m", "strahler", "log_discharge", "log_width", "grad_dem", "dist_source_km")
 
 
 # --- PCA of the hydro-geographic gradient (13 sites) ------------------------------------------------------------------
@@ -35,6 +50,26 @@ cat(glue("Variance explained (PC1-3): ",
          "{var_explained[1]}% {var_explained[2]}% {var_explained[3]}%"), NL)
 cat("PC1 loadings:", NL, sep = "")
 print(round(sort(pca$rotation[, 1]), STAT_DP))
+
+# Plot-ready PCA for Fig. 6: site scores with their river section, variable loadings, and the variance per axis.
+tibble(
+    site    = rownames(pca$x),
+    section = as.character(section[match(rownames(pca$x), meta$site)]),
+    PC1     = round(pca$x[, 1], STAT_DP),
+    PC2     = round(pca$x[, 2], STAT_DP)
+) |>
+    write.csv(PCA_SCORES_FILE, row.names = FALSE)
+
+tibble(
+    variable = rownames(pca$rotation),
+    PC1      = round(pca$rotation[, 1], STAT_DP),
+    PC2      = round(pca$rotation[, 2], STAT_DP)
+) |>
+    write.csv(PCA_LOADINGS_FILE, row.names = FALSE)
+
+tibble(axis = paste0("PC", seq_along(var_explained)), percent = var_explained) |>
+    head(3) |>
+    write.csv(PCA_VARIANCE_FILE, row.names = FALSE)
 
 
 # --- Great-circle (haversine) distance between sites ------------------------------------------------------------------
@@ -65,7 +100,9 @@ haversine_dist <- function(lon, lat) {
 
 
 # --- Environment-community relationships, within each season (n = 13) -------------------------------------------------
-for (season_name in SEASONS) {
+# The per-season results are collected rather than only printed, because Figs 7 and 8 are drawn from them. Each season
+# contributes its dbRDA ordination, its arrow coordinates, and its full list of site pairs.
+gradient_results <- map(SEASONS, \(season_name) {
     season_data <- season_subset(season_name)
     season_env  <- season_data$env
     bray_dist   <- vegdist(season_data$rel, "bray")
@@ -78,7 +115,7 @@ for (season_name in SEASONS) {
 
     # dbRDA on the individual hydro-geographic factors
     dbrda <- capscale(
-        season_data$rel ~ elev_m + strahler + log_discharge + log_width + grad_dem + dist_source_km,
+        as.formula(paste("season_data$rel ~", paste(DBRDA_VARS, collapse = " + "))),
         data = season_env, distance = "bray"
     )
     dbrda_test <- anova(dbrda, permutations = N_PERM_QUICK)
@@ -95,7 +132,68 @@ for (season_name in SEASONS) {
              "p = {sprintf(P_FMT, mantel_env$signif)} | partial (|geo): ",
              "r = {round(mantel_env_partial$statistic, STAT_DP)}, ",
              "p = {sprintf(P_FMT, mantel_env_partial$signif)}"), NL)
-}
+
+    # --- Plot-ready pieces for Figs 7 and 8 ---
+    # Constrained axis percentages are taken over the constrained inertia, which is what a dbRDA axis label means.
+    constrained_eig <- dbrda$CCA$eig
+    axis_percent    <- 100 * constrained_eig / sum(constrained_eig)
+
+    site_scores <- scores(dbrda, display = "wa", choices = 1:2, scaling = 2)
+    arrows      <- scores(dbrda, display = "bp", choices = 1:2, scaling = 2)
+
+    # Pairwise environmental distance against compositional dissimilarity, one row per site pair.
+    pair_index <- which(lower.tri(as.matrix(bray_dist)), arr.ind = TRUE)
+    site_ids   <- rownames(as.matrix(bray_dist))
+
+    # Resolved before the tibble below, because a column named `season` would otherwise shadow the global season
+    # vector inside the same tibble() call and silently return all 26 rows instead of this season's 13.
+    season_sections <- as.character(section[season == season_name])
+
+    list(
+        scores = tibble(
+            season  = season_name,
+            site    = season_data$site_ids,
+            section = season_sections,
+            CAP1    = round(site_scores[, 1], STAT_DP),
+            CAP2    = round(site_scores[, 2], STAT_DP)
+        ),
+        arrows = tibble(
+            season   = season_name,
+            variable = rownames(arrows),
+            CAP1     = round(arrows[, 1], STAT_DP),
+            CAP2     = round(arrows[, 2], STAT_DP)
+        ),
+        stats = tibble(
+            season       = season_name,
+            adj_R2       = round(RsquareAdj(dbrda)$adj.r.squared, STAT_DP),
+            p            = signif(dbrda_test[["Pr(>F)"]][1], P_SIGFIG),
+            cap1_percent = round(axis_percent[1], VAR_DP),
+            cap2_percent = round(axis_percent[2], VAR_DP)
+        ),
+        pairs = tibble(
+            season       = season_name,
+            site_1       = site_ids[pair_index[, "row"]],
+            site_2       = site_ids[pair_index[, "col"]],
+            env_distance = round(as.matrix(env_dist)[pair_index], STAT_DP),
+            bray         = round(as.matrix(bray_dist)[pair_index], DIST_DP)
+        ),
+        mantel = tibble(
+            season    = season_name,
+            mantel_r  = round(mantel_env$statistic, STAT_DP),
+            p         = signif(mantel_env$signif, P_SIGFIG),
+            partial_r = round(mantel_env_partial$statistic, STAT_DP),
+            partial_p = signif(mantel_env_partial$signif, P_SIGFIG)
+        )
+    )
+})
+
+# Variables keep their column names here; the figure scripts attach display labels, so nothing presentational leaks
+# into the analysis output.
+map(gradient_results, "scores") |> bind_rows() |> write.csv(DBRDA_SCORES_FILE, row.names = FALSE)
+map(gradient_results, "arrows") |> bind_rows() |> write.csv(DBRDA_ARROWS_FILE, row.names = FALSE)
+map(gradient_results, "stats")  |> bind_rows() |> write.csv(DBRDA_STATS_FILE,  row.names = FALSE)
+map(gradient_results, "pairs")  |> bind_rows() |> write.csv(ENV_PAIRS_FILE,    row.names = FALSE)
+map(gradient_results, "mantel") |> bind_rows() |> write.csv(MANTEL_STATS_FILE, row.names = FALSE)
 
 
 # --- Alpha diversity vs PC1 (within season, BH-FDR across the 22 tests) -----------------------------------------------

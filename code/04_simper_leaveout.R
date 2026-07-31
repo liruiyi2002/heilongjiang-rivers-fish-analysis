@@ -38,10 +38,19 @@ simper_res <- simper_res[order(-simper_res$average), ]
 # would give a number on the wrong scale.
 overall_dissimilarity <- sum(simper_res$average)
 simper_res$share_pct  <- 100 * simper_res$average / overall_dissimilarity
+
+# Which season a taxon is more abundant in. It is not part of the SIMPER statistic, but a contribution says only how
+# much a taxon separates the seasons, not which way, so Fig. S1A colours each bar by direction.
+season_means <- vapply(SEASONS, \(season_name) colMeans(rel[season == season_name, , drop = FALSE]),
+                       numeric(ncol(rel)))
+higher_in    <- ifelse(season_means[rownames(simper_res), AUTUMN] >
+                       season_means[rownames(simper_res), SPRING], AUTUMN, SPRING)
+
 top_contributors <- tibble(
     taxon            = rownames(simper_res),
     contribution_pct = round(simper_res$share_pct, PCT_DP),
-    cumulative_pct   = round(cumsum(simper_res$share_pct), PCT_DP)
+    cumulative_pct   = round(cumsum(simper_res$share_pct), PCT_DP),
+    higher_in        = unname(higher_in)
 ) |>
     slice_head(n = N_TOP_SIMPER)
 cat(NL, "== SIMPER: top contributors to spring-autumn dissimilarity ==", NL, sep = "")

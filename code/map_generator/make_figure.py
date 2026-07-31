@@ -72,7 +72,10 @@ _REPOSITORY_DIR = _SCRIPT_DIR.parents[1]
 
 DATA_DIR = _REPOSITORY_DIR / "data"
 GEO_DIR = DATA_DIR / "geo"
-OUTPUT_DIR = _REPOSITORY_DIR / "outputs"
+
+# Submission artwork goes to figures/ alongside the figures the R scripts draw, so the whole figure set lands in one
+# place. outputs/ holds numerical results only.
+OUTPUT_DIR = _REPOSITORY_DIR / "figures"
 
 _SITE_METADATA_FILE = DATA_DIR / "site_metadata.csv"
 _SITE_ENVIRONMENT_FILE = DATA_DIR / "site_environment.csv"
@@ -89,7 +92,11 @@ _COLUMN_WIDTH_MM = 190.0
 _FIGURE_HEIGHT_MM = 150.0
 _MINIMUM_POINT_SIZE = 7.0
 _PRINT_DPI = 500
-_SUBMISSION_PNG_DPI = 300
+
+# The PNG is what the manuscript builders embed into the .docx, so it is written at the same resolution as the TIFF
+# rather than at the 300 dpi floor. Every other figure's PNG comes out of figure_style.R at 500 dpi, and a single
+# figure at a lower resolution is visible as soon as the manuscript is scrolled.
+_SUBMISSION_PNG_DPI = 500
 _REVIEW_DPI = 150
 
 # Supersampling smooths Pillow's unantialiased primitives. The print renders need less of it because the extra

@@ -14,7 +14,8 @@
   [`map_generator/README.zh-CN.md`](map_generator/README.zh-CN.md)。R 流程本身无需 Python。
 - 首次运行时由 `00_setup.R` **自动安装**缺失的包：`vegan`、`FD`、`iNEXT`、`indicspecies`、`cluster`、
   `dplyr`、`tidyr`、`purrr`、`stringr`、`glue`。
-- 可选：`betapart`。若未安装，脚本 `03` 会为功能 beta 多样性分解打印可直接运行的模板，其余结果照常运行。
+- **绘图：** `ggplot2`、`patchwork`、`scales`、`ggrepel`，首次运行时由 `figure_style.R` 自动安装。
+- **无需** `betapart`。脚本 `03` 直接由 UPGMA 性状树的枝长自行计算功能 beta 多样性分解。
 
 ## 如何运行
 
@@ -39,11 +40,14 @@ Rscript code/03_beta_diversity.R
 | `00_setup.R`                | 载入数据、构建矩阵、加载/安装 R 包、定义常量。           | （被所有脚本调用） |
 | `01_composition.R`          | 读数、目/科/属计数、共有/特有类群、覆盖度、优势类群。    | 结果 3.1、图 2     |
 | `02_alpha_diversity.R`      | 分类与功能 alpha；季节配对 Wilcoxon（BH-FDR）。          | 图 3、表 S1        |
-| `03_beta_diversity.R`       | PERMANOVA、betadisper、PCoA；周转/嵌套分解。             | 图 4               |
+| `03_beta_diversity.R`       | 分类与功能两层面的 PERMANOVA、betadisper、PCoA 与周转/嵌套分解。 | 图 4         |
 | `04_simper_leaveout.R`      | SIMPER；留一 PERMANOVA；IndVal.g；洄游读数占比。         | 图 S1、表 S2-S4    |
 | `05_taxonomy_function.R`    | 分类-功能耦合：Spearman（alpha）、Mantel（beta）。       | 图 5、表 S5-S6     |
 | `06_environment_gradient.R` | PCA；alpha 对 PC1；组成对 PC1；dbRDA；Mantel/偏 Mantel。 | 图 6-8、表 S7      |
-| `07_water_quality_supp.R`   | 水质与 alpha 多样性（附加分析；不含土地利用）。          | 图 S2（部分）      |
+| `07_water_quality_supp.R`   | 水质与土地覆被对 alpha 多样性；四个 dbRDA 模型。         | 图 S2、表 S8-S9    |
+| `08_figures_main.R`         | 依据 `outputs/` 按期刊规范绘制图 2-8。                   | 图 2-8             |
+| `09_figures_supp.R`         | 依据 `outputs/` 按期刊规范绘制图 S1-S2。                 | 图 S1-S2           |
+| `figure_style.R`            | 插图规范：栏宽、最小 7 pt 字号、500 dpi、配色、保存与校验。 | （被 08-09 调用） |
 | `run_all.R`                 | 依次运行 01-07。                                         | -                  |
 | `map_generator/`            | 图 1（研究区域 + 河网位置）。**Python**，见其 README。    | 图 1               |
 

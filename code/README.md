@@ -15,8 +15,9 @@ No internet or raw sequence reads are needed (only a one-off package install on 
   [`map_generator/README.md`](map_generator/README.md). The R pipeline does not need it.
 - Packages, **installed automatically** by `00_setup.R` if missing: `vegan`, `FD`, `iNEXT`,
   `indicspecies`, `cluster`, `dplyr`, `tidyr`, `purrr`, `stringr`, `glue`.
-- **Optional:** `betapart`. Script `03` prints a ready-to-run template for the functional
-  beta-diversity partition if `betapart` is not installed; every other result still runs.
+- **Figures:** `ggplot2`, `patchwork`, `scales`, `ggrepel`, installed by `figure_style.R` on first run.
+- **Not required:** `betapart`. Script `03` computes the functional beta-diversity partition itself, from
+  branch lengths on a UPGMA trait dendrogram.
 
 ## How to run
 
@@ -42,11 +43,14 @@ Rscript code/03_beta_diversity.R
 | `00_setup.R`                | Load data, build matrices, attach/install packages, define constants.      | (sourced by all)      |
 | `01_composition.R`          | Reads, order/family/genus counts, shared/unique taxa, coverage, dominants. | Results 3.1, Fig. 2   |
 | `02_alpha_diversity.R`      | Taxonomic and functional alpha; seasonal paired Wilcoxon (BH-FDR).         | Fig. 3, Table S1      |
-| `03_beta_diversity.R`       | PERMANOVA, betadisper, PCoA; turnover/nestedness partition.                | Fig. 4                |
+| `03_beta_diversity.R`       | PERMANOVA, betadisper, PCoA and turnover/nestedness, taxonomic and functional. | Fig. 4            |
 | `04_simper_leaveout.R`      | SIMPER; leave-one-out PERMANOVA; IndVal.g; migratory read share.           | Fig. S1, Tables S2-S4 |
 | `05_taxonomy_function.R`    | Taxonomy-function coupling: Spearman (alpha), Mantel (beta).               | Fig. 5, Tables S5-S6  |
 | `06_environment_gradient.R` | PCA; alpha vs PC1; composition vs PC1; dbRDA; Mantel/partial Mantel.       | Figs 6-8, Table S7    |
-| `07_water_quality_supp.R`   | Water quality vs alpha diversity (supplementary; land use not included).   | Fig. S2 (part)        |
+| `07_water_quality_supp.R`   | Water quality and land cover vs alpha diversity; four dbRDA models.        | Fig. S2, Tables S8-S9 |
+| `08_figures_main.R`         | Draws Figures 2-8 from `outputs/`, at journal specification.                | Figs 2-8              |
+| `09_figures_supp.R`         | Draws Figures S1-S2 from `outputs/`, at journal specification.             | Figs S1-S2            |
+| `figure_style.R`            | Artwork specification: column widths, 7 pt minimum, 500 dpi, palettes, save-and-verify. | (sourced by 08-09) |
 | `run_all.R`                 | Run 01-07 in order.                                                        | -                     |
 | `map_generator/`            | Figure 1 (study area + river-network position). **Python**; see its README. | Fig. 1                |
 

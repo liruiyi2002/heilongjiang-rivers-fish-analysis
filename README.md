@@ -15,11 +15,13 @@ tables in [`data/`](data), with no internet access or raw sequence reads require
 
 ```
 .
-├── code/                 # analysis scripts 00–07 + run_all.R  (see code/README.md)
+├── code/                 # analysis scripts 00–07, figure scripts 08–09 + run_all.R  (see code/README.md)
+│   ├── figure_style.R      # journal artwork specification: widths, 7 pt minimum, 500 dpi, palettes
 │   └── map_generator/      # Figure 1 study-area map  (Python + Pillow; see its README)
 ├── data/                 # input CSVs + README.md (data provenance: what each file is, where it's from)
 │   └── geo/              # clipped basemap extracts for Figure 1  (see geo/SOURCES.md)
-├── outputs/              # tables written by the scripts  (generated; not tracked in git)
+├── outputs/              # results and tables written by the scripts  (generated; not tracked in git)
+├── figures/              # every figure as TIFF + PNG + PDF  (generated; not tracked in git)
 ├── README.md             # this file
 ├── CITATION.cff          # how to cite  (also CITATION.bib for BibTeX/LaTeX)
 ├── LICENSE               # dual-license summary
@@ -30,22 +32,33 @@ tables in [`data/`](data), with no internet access or raw sequence reads require
 ## Requirements
 
 - **R ≥ 4.1** (native `|>` pipe; tested on 4.3.3).
-- Packages are **installed automatically** on first run by `code/00_setup.R`: `vegan`, `FD`, `iNEXT`,
-  `indicspecies`, `cluster`, `dplyr`, `tidyr`, `purrr`, `stringr`, `glue`.
-- Optional: `betapart` (script `03` prints a ready-to-run template if it is absent).
+- Packages are **installed automatically** on first run by `code/00_setup.R` and `code/figure_style.R`:
+  `vegan`, `FD`, `iNEXT`, `indicspecies`, `cluster`, `ape`, `dplyr`, `tidyr`, `purrr`, `stringr`, `glue`,
+  and for the figures `ggplot2`, `patchwork`, `scales`, `ggrepel`.
+- **Python ≥ 3.12 with Pillow**, for Figure 1 only.
+- No package outside that list is needed. The functional beta-diversity partition is computed here from
+  branch lengths on a trait dendrogram, so `betapart` is **not** required.
 
 ## Quick start
 
 ```sh
 git clone https://github.com/liruiyi2002/heilongjiang-rivers-fish-analysis.git
 cd heilongjiang-rivers-fish-analysis
-Rscript code/run_all.R
+Rscript code/run_all.R                                # results, tables and Figures 2–8, S1–S2
+python code/map_generator/make_figure.py --print      # Figure 1 (the study-area map)
 ```
 
-Headline numbers print to the console; the supplementary tables are written to `outputs/`. To run one
-step at a time, execute any `code/NN_*.R` script directly (each sources `code/00_setup.R`); note that
-`05`, `06` and `07` need the alpha-diversity table written by `02`, so run `02` (or the full pipeline)
-first. See [`code/README.md`](code/README.md) for a per-script guide and the configurable parameters.
+That reproduces **everything the manuscript reports**: headline numbers print to the console, the
+supplementary tables land in `outputs/`, and every figure lands in `figures/` as a 500 dpi LZW TIFF, a
+matching PNG and a vector PDF. Each figure is drawn only from files in `outputs/`, so a figure cannot
+disagree with the statistic it reports — change an analysis and the figure follows on the next run.
+Artwork is written at the journal's own limits (90/140/190 mm column widths, 7 pt minimum lettering,
+500 dpi for combination artwork) and each file is measured after writing; any breach is reported.
+
+To run one step at a time, execute any `code/NN_*.R` script directly (each sources `code/00_setup.R`).
+Scripts `05`–`07` need the alpha-diversity table written by `02`, and the figure scripts `08`–`09` need
+`01`–`07`, so run the full pipeline first if in doubt. See [`code/README.md`](code/README.md) for a
+per-script guide and the configurable parameters.
 
 ## Data
 

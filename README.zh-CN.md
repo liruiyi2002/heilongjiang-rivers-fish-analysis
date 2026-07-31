@@ -11,10 +11,12 @@
 ```
 .
 ├── code/                 # 分析脚本 00–07 + run_all.R（见 code/README.md）
+│   ├── figure_style.R      # 期刊插图规范：栏宽、最小 7 pt 字号、500 dpi、配色
 │   └── map_generator/      # 图 1 研究区域地图（Python + Pillow；见其 README）
 ├── data/                 # 输入 CSV + README.md（数据溯源：各文件的内容与来源）
 │   └── geo/              # 图 1 所用底图裁剪子集（见 geo/SOURCES.md）
-├── outputs/              # 脚本生成的结果表（自动生成；不纳入 git）
+├── outputs/              # 脚本生成的结果与表格（自动生成；不纳入 git）
+├── figures/              # 全部插图的 TIFF + PNG + PDF（自动生成；不纳入 git）
 ├── README.md             # 英文说明
 ├── README.zh-CN.md       # 本文件（中文说明）
 ├── CITATION.cff          # 引用信息（BibTeX/LaTeX 见 CITATION.bib）
@@ -26,21 +28,29 @@
 ## 环境要求
 
 - **R ≥ 4.1**（原生 `|>` 管道；已在 4.3.3 上测试）。
-- 首次运行时由 `code/00_setup.R` **自动安装**缺失的包：`vegan`、`FD`、`iNEXT`、`indicspecies`、`cluster`、
-  `dplyr`、`tidyr`、`purrr`、`stringr`、`glue`。
-- 可选：`betapart`（脚本 `03` 在其缺失时打印可直接运行的模板）。
+- 首次运行时由 `code/00_setup.R` 与 `code/figure_style.R` **自动安装**缺失的包：`vegan`、`FD`、`iNEXT`、
+  `indicspecies`、`cluster`、`ape`、`dplyr`、`tidyr`、`purrr`、`stringr`、`glue`，绘图另需 `ggplot2`、
+  `patchwork`、`scales`、`ggrepel`。
+- **Python ≥ 3.12 与 Pillow**，仅用于图 1。
+- 除上述之外无其他依赖。功能 beta 多样性分解在本包内由性状树枝长直接计算，**不需要** `betapart`。
 
 ## 快速开始
 
 ```sh
 git clone https://github.com/liruiyi2002/heilongjiang-rivers-fish-analysis.git
 cd heilongjiang-rivers-fish-analysis
-Rscript code/run_all.R
+Rscript code/run_all.R                                # 结果、表格与图 2–8、S1–S2
+python code/map_generator/make_figure.py --print      # 图 1（研究区地图）
 ```
 
-主要数值打印到控制台，附表写入 `outputs/`。也可单独运行任一 `code/NN_*.R` 脚本（每个都会 source
-`code/00_setup.R`）；注意 `05`、`06`、`07` 需要 `02` 写出的 alpha 多样性表，请先运行 `02`（或整个流程）。逐脚本
-说明与可调参数见 [`code/README.zh-CN.md`](code/README.zh-CN.md)。
+由此可复现**稿件所报告的全部内容**：主要数值打印到控制台，附表写入 `outputs/`，全部插图写入 `figures/`，
+每幅均包含 500 dpi LZW TIFF、同尺寸 PNG 与矢量 PDF。每幅插图仅取自 `outputs/` 中的文件，因此图形与其所报告的
+统计量不会脱节——分析一旦改变，下次运行图形即随之更新。插图按期刊自身限制输出（栏宽 90/140/190 mm、最小
+7 pt 字号、组合图 500 dpi），且写出后逐一实测，任何不达标均会报告。
+
+也可单独运行任一 `code/NN_*.R` 脚本（每个都会 source `code/00_setup.R`）；注意 `05`–`07` 需要 `02` 写出的
+alpha 多样性表，绘图脚本 `08`–`09` 需要 `01`–`07` 的输出，如不确定请直接运行完整流程。逐脚本说明与可调参数见
+[`code/README.zh-CN.md`](code/README.zh-CN.md)。
 
 ## 数据
 

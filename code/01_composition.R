@@ -21,6 +21,7 @@ source(file.path(.dir, "00_setup.R"))
 # Output files written by this script, and the size of the "most abundant" summaries.
 TOP_TAXA_FILE   <- file.path(OUT_DIR, "Table_top_abundant_taxa.csv")
 OCCURRENCE_FILE <- file.path(OUT_DIR, "Fig2_seasonal_occurrence.csv")
+SHARES_FILE     <- file.path(OUT_DIR, "Fig2_composition_shares.csv")
 TOP_N           <- 10
 
 cat(NL, "== Community composition / 群落组成 ==", NL, sep = "")
@@ -130,6 +131,46 @@ occurrence <- tibble(taxon = union(spring_taxa, autumn_taxa)) |>
         autumn = as.integer(taxon %in% autumn_taxa)
     )
 
+
+# --- Fig. 2B stacked composition: named taxa plus a pooled remainder --------------------------------------------------
+# Panel B stacks the taxa that are dominant in at least one season, so a taxon abundant only in autumn still appears in
+# the spring bar at its true (small) share. Everything outside that set is pooled into one remainder band, which keeps
+# the bars summing to 100% without a legend of 100 entries.
+named_taxa <- union(
+    top_taxa(SPRING)$taxon,
+    top_taxa(AUTUMN)$taxon
+)
+
+#' Read shares for one season, with the unnamed taxa pooled. / 某季节的读数占比，未列出的类群合并为其他。
+#'
+#' @param season_name Season label, "Spring" or "Autumn".
+#' @return A tibble of season, taxon (or "Others") and percentage of that season's reads.
+composition_shares <- function(season_name) {
+    season_totals <- colSums(reads[season == season_name, , drop = FALSE])
+    percentages   <- 100 * season_totals / sum(season_totals)
+    bind_rows(
+        tibble(season = season_name, taxon = named_taxa, rel_pct = unname(percentages[named_taxa])),
+        tibble(season = season_name, taxon = "Others",   rel_pct = sum(percentages[setdiff(names(percentages),
+                                                                                          named_taxa)]))
+    )
+}
+
+# Ordered by pooled abundance so the stacking order is stable and the legend reads largest-first, with the remainder
+# band last regardless of its size.
+taxon_order <- names(sort(colSums(reads)[named_taxa], decreasing = TRUE))
+
+shares <- map(SEASONS, composition_shares) |>
+    bind_rows() |>
+    mutate(
+        taxon   = factor(taxon, levels = c(taxon_order, "Others")),
+        rel_pct = round(rel_pct, PCT_DP)
+    ) |>
+    arrange(season, taxon)
+
+cat(glue("{NL}Fig. 2B: {length(named_taxa)} named taxa plus a pooled remainder"), NL)
+
 write.csv(top_taxa_table, TOP_TAXA_FILE,   row.names = FALSE)
 write.csv(occurrence,     OCCURRENCE_FILE, row.names = FALSE)
-cat(NL, "wrote outputs/Table_top_abundant_taxa.csv, Fig2_seasonal_occurrence.csv", NL, sep = "")
+write.csv(shares,         SHARES_FILE,     row.names = FALSE)
+cat(NL, "wrote outputs/Table_top_abundant_taxa.csv, Fig2_seasonal_occurrence.csv, Fig2_composition_shares.csv",
+    NL, sep = "")

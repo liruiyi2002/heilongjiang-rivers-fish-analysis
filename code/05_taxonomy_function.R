@@ -20,9 +20,11 @@
 source(file.path(.dir, "00_setup.R"))
 set.seed(RANDOM_SEED)
 
-# Output files written by this script (ALPHA_SITE_FILE is defined in 00_setup.R).
+# Output files written by this script (ALPHA_SITE_FILE is defined in 00_setup.R). The Fig. 5 file holds one row per
+# sample pair, which is what panel B plots, so the scatter and the Mantel statistic come from the same numbers.
 ALPHA_TAXFUN_FILE <- file.path(OUT_DIR, "TableS5_taxfun_alpha_spearman.csv")
 BETA_MANTEL_FILE  <- file.path(OUT_DIR, "TableS6_taxfun_beta_mantel.csv")
+BETA_PAIRS_FILE   <- file.path(OUT_DIR, "Fig5_beta_pairs.csv")
 
 if (!file.exists(ALPHA_SITE_FILE)) stop("Run 02_alpha_diversity.R first.")
 alpha <- read.csv(ALPHA_SITE_FILE, check.names = FALSE)
@@ -67,17 +69,48 @@ cat(NL, "== Beta-scale Mantel (Bray-Curtis vs functional CWM distance) ==", NL, 
 cat(glue("  pooled: r = {round(pooled_mantel$statistic, STAT_DP)}, ",
          "p = {sprintf(P_FMT, pooled_mantel$signif)}"), NL)
 
-for (season_name in SEASONS) {
+seasonal_results <- map(SEASONS, \(season_name) {
     seasonal_bray   <- vegdist(rel[season == season_name, ], "bray")
     seasonal_cwm    <- gowdis(cwm[season == season_name, ])
     seasonal_mantel <- mantel(seasonal_bray, seasonal_cwm, permutations = N_PERM)
     cat(glue("  {season_name}: r = {round(seasonal_mantel$statistic, STAT_DP)}, ",
              "p = {sprintf(P_FMT, seasonal_mantel$signif)}"), NL)
-}
+    tibble(scope = season_name,
+           mantel_r = round(seasonal_mantel$statistic, STAT_DP),
+           p = signif(seasonal_mantel$signif, P_SIGFIG))
+}) |>
+    bind_rows()
 
-write.csv(
+# Pooled first, then each season, so the table carries every value quoted in the text.
+bind_rows(
     tibble(scope = "pooled",
            mantel_r = round(pooled_mantel$statistic, STAT_DP),
            p = signif(pooled_mantel$signif, P_SIGFIG)),
-    BETA_MANTEL_FILE, row.names = FALSE
-)
+    seasonal_results
+) |>
+    write.csv(BETA_MANTEL_FILE, row.names = FALSE)
+
+
+# --- Plot-ready pair list for Fig. 5B ---------------------------------------------------------------------------------
+# One row per sample pair, holding the two dissimilarities the Mantel test compares. Panel B is a scatter of exactly
+# these columns, so the cloud of points and the reported r describe the same comparison. Whether a pair is within or
+# between seasons is carried too, since that is the structure the pooled correlation is built on.
+pair_index  <- which(lower.tri(as.matrix(bray_dist)), arr.ind = TRUE)
+sample_ids  <- rownames(as.matrix(bray_dist))
+
+beta_pairs <- tibble(
+    sample_1      = sample_ids[pair_index[, "row"]],
+    sample_2      = sample_ids[pair_index[, "col"]],
+    taxonomic     = round(as.matrix(bray_dist)[pair_index], DIST_DP),
+    functional    = round(as.matrix(func_dist)[pair_index], DIST_DP)
+) |>
+    mutate(
+        season_1 = sub(paste0(NAME_SEP, ".*$"), "", sample_1),
+        season_2 = sub(paste0(NAME_SEP, ".*$"), "", sample_2),
+        comparison = if_else(season_1 == season_2, paste("Within", season_1), "Between seasons")
+    ) |>
+    select(sample_1, sample_2, comparison, taxonomic, functional)
+
+write.csv(beta_pairs, BETA_PAIRS_FILE, row.names = FALSE)
+cat(NL, "wrote outputs/TableS5_taxfun_alpha_spearman.csv, TableS6_taxfun_beta_mantel.csv, Fig5_beta_pairs.csv",
+    NL, sep = "")

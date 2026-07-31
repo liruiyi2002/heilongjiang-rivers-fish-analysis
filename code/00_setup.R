@@ -16,9 +16,10 @@
 .libPaths(c("~/R/library", .libPaths()))
 
 # vegan (ecology: distances, PERMANOVA, ordination), FD (functional diversity),
-# iNEXT (sample coverage), indicspecies (IndVal.g), cluster (Gower distance);
+# iNEXT (sample coverage), indicspecies (IndVal.g), cluster (Gower distance),
+# ape (trait dendrogram and corrected PCoA for the functional beta partition);
 # dplyr / tidyr / purrr / stringr / glue (tidy data manipulation and strings).
-required_packages <- c("vegan", "FD", "iNEXT", "indicspecies", "cluster",
+required_packages <- c("vegan", "FD", "iNEXT", "indicspecies", "cluster", "ape",
                        "dplyr", "tidyr", "purrr", "stringr", "glue")
 missing_packages <- setdiff(required_packages, rownames(installed.packages()))
 if (length(missing_packages)) {
@@ -42,7 +43,9 @@ CODE_DIR <- if (length(this_file)) {
 REPRO_DIR <- normalizePath(file.path(CODE_DIR, ".."))
 DATA_DIR  <- file.path(REPRO_DIR, "data")
 OUT_DIR   <- file.path(REPRO_DIR, "outputs")
+FIG_DIR   <- file.path(REPRO_DIR, "figures")     # submission-ready artwork, written by 08 and 09
 dir.create(OUT_DIR, showWarnings = FALSE, recursive = TRUE)
+dir.create(FIG_DIR, showWarnings = FALSE, recursive = TRUE)
 
 
 # --- Data file names, and the one output shared between scripts -------------------------------------------------------
