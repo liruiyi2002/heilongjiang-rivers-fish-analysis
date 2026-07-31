@@ -270,10 +270,14 @@ alpha_coupling <- read_output("TableS5_taxfun_alpha_spearman.csv", "05_taxonomy_
 beta_pairs     <- read_output("Fig5_beta_pairs.csv",               "05_taxonomy_function.R")
 mantel_stats   <- read_output("TableS6_taxfun_beta_mantel.csv",    "05_taxonomy_function.R")
 
+# One panel per scope: pooled across the year, then within each season. Table S5 carries all three, and reading the
+# file without filtering would stack them in one grid.
+# 每个范围一个面板：全年合并、再分季节。表 S5 含三者，若不筛选会叠加于同一网格。
 coupling_cells <- alpha_coupling |>
     mutate(
         tax   = factor(tax, levels = rev(c("Richness", "Shannon", "Simpson", "Pielou"))),
         fun   = factor(fun, levels = c("FRic", "FEve", "FDis", "FDiv")),
+        scope = factor(scope, levels = c("Combined", SPRING, AUTUMN)),
         label = sprintf("%.2f%s", rho, if_else(FDR < FDR_ALPHA, "*", ""))
     )
 
@@ -282,15 +286,15 @@ figure_5a <- ggplot(coupling_cells, aes(fun, tax, fill = rho)) +
     # Significant cells are boxed and bolded as well as starred, so they are visible at a glance rather than needing
     # the reader to hunt for a small asterisk.
     # 显著单元格除加星外另加框并加粗，使其一望即见。
-    significance_layers(coupling_cells, coupling_cells$FDR < FDR_ALPHA, BASE_PT) +
+    significance_layers(coupling_cells, coupling_cells$FDR < FDR_ALPHA, SMALL_PT) +
+    facet_wrap(~ scope, nrow = 1) +
     scale_fill_gradient2(low = DIVERGING_LOW, mid = DIVERGING_MID, high = DIVERGING_HIGH,
                          midpoint = 0, limits = c(-1, 1), name = expression(Spearman~rho),
                          # Title above the bar, or it collides with the -1.0 end label.
                          # 标题置于色带之上，否则与 -1.0 端标签相撞。
                          guide = guide_colourbar(title.position = "top", title.hjust = 0.5)) +
     labs(x = "Functional alpha", y = "Taxonomic alpha",
-         caption = "Boxed, bold and starred cells are significant after BH correction") +
-    coord_equal() +
+         caption = "Boxed, bold and starred cells are significant after BH correction within their scope") +
     theme_journal(grid = "none") +
     # A horizontal colour bar under the matrix, rather than a vertical one beside it, which would otherwise sit in the
     # gap between the two panels and read as belonging to neither.
@@ -303,22 +307,32 @@ figure_5a <- ggplot(coupling_cells, aes(fun, tax, fill = rho)) +
         plot.caption      = element_text(size = SMALL_PT, colour = INK_SECONDARY, hjust = 0)
     )
 
-pooled_mantel <- mantel_stats[mantel_stats$scope == "pooled", ]
+# TableS6 labels the pooled row "Combined"; matching on the wrong label silently returned no row, which is how the
+# annotation disappeared from this panel.
+# 表 S6 中合并行标为 "Combined"；标签不符会静默返回空行，本面板的标注即因此消失。
+pooled_mantel <- mantel_stats[mantel_stats$scope == "Combined", ]
+stopifnot(nrow(pooled_mantel) == 1)
+
+# Positioned in data coordinates rather than at +/-Inf, so the label cannot drift outside the panel when the figure is
+# re-laid-out. / 以数据坐标定位而非 ±Inf，重排版式时标注不会移出面板。
+annotation_x <- min(beta_pairs$taxonomic)
+annotation_y <- max(beta_pairs$functional) * 1.12
+
 figure_5b <- ggplot(beta_pairs, aes(taxonomic, functional)) +
     geom_point(size = POINT_SIZE_DENSE, colour = INK_SECONDARY, alpha = MARKER_ALPHA * 0.7) +
     geom_smooth(method = "lm", formula = y ~ x, linewidth = 0.4,
                 colour = PAL_SEASON[[SPRING]], fill = PAL_SEASON[[SPRING]], alpha = 0.18) +
-    annotate("text", x = -Inf, y = Inf,
+    annotate("text", x = annotation_x, y = annotation_y,
              label = sprintf("Mantel r = %.3f, P = %s", pooled_mantel$mantel_r, format_p(pooled_mantel$p)),
-             hjust = -0.05, vjust = 1.6, size = text_size(BASE_PT), colour = INK_PRIMARY) +
+             hjust = 0, vjust = 1, size = text_size(BASE_PT), colour = INK_PRIMARY) +
     labs(x = "Taxonomic dissimilarity (Bray-Curtis)", y = "Functional dissimilarity (Gower on CWM)") +
     scale_y_continuous(expand = expansion(mult = c(0.05, 0.2))) +
     theme_journal()
 
-figure_5 <- (figure_5a | figure_5b) +
-    plot_layout(widths = c(1, 1.15)) +
+figure_5 <- (figure_5a / figure_5b) +
+    plot_layout(heights = c(1, 1.05)) +
     plot_annotation(tag_levels = "A")
-save_figure(figure_5, "Figure5", WIDTH_FULL_MM, 82)
+save_figure(figure_5, "Figure5", WIDTH_FULL_MM, 145)
 
 
 # --- Figure 6: hydro-geographic PCA -----------------------------------------------------------------------------------
