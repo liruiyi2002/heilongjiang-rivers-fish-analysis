@@ -26,6 +26,7 @@ set.seed(RANDOM_SEED)
 # this script reports rather than from a second, independent computation.
 ALPHA_PC1_FILE <- file.path(OUT_DIR, "alpha_vs_PC1.csv")
 SECTIONS_FILE  <- file.path(OUT_DIR, "TableS7_spatial_sections.csv")
+CONTRASTS_FILE <- file.path(OUT_DIR, "TableS7b_section_contrasts.csv")
 PCA_SCORES_FILE    <- file.path(OUT_DIR, "Fig6_pca_scores.csv")
 PCA_LOADINGS_FILE  <- file.path(OUT_DIR, "Fig6_pca_loadings.csv")
 PCA_VARIANCE_FILE  <- file.path(OUT_DIR, "Fig6_pca_variance.csv")
@@ -34,6 +35,9 @@ DBRDA_ARROWS_FILE  <- file.path(OUT_DIR, "Fig7_dbrda_arrows.csv")
 DBRDA_STATS_FILE   <- file.path(OUT_DIR, "Fig7_dbrda_stats.csv")
 ENV_PAIRS_FILE     <- file.path(OUT_DIR, "Fig8_env_pairs.csv")
 MANTEL_STATS_FILE  <- file.path(OUT_DIR, "Fig8_mantel_stats.csv")
+
+# Written by 03_beta_diversity.R; needed here for the functional half of the spatial-section analysis.
+FUNCTIONAL_DIST_FILE <- file.path(OUT_DIR, "functional_distance.csv")
 
 EARTH_RADIUS_KM <- 6371   # mean Earth radius, for the haversine distance
 
@@ -226,21 +230,89 @@ if (file.exists(ALPHA_SITE_FILE)) {
 }
 
 
-# --- Spatial beta diversity among river sections (within season) ------------------------------------------------------
-sections <- map(SEASONS, \(season_name) {
-    season_data        <- season_subset(season_name)
-    bray_dist          <- vegdist(season_data$rel, "bray")
-    river_section      <- factor(section[season == season_name])
-    section_permanova  <- adonis2(bray_dist ~ river_section, permutations = N_PERM)
-    section_dispersion <- anova(betadisper(bray_dist, river_section))
-    tibble(
-        season       = season_name,
-        PERMANOVA_R2 = round(section_permanova$R2[1], STAT_DP),
-        PERMANOVA_p  = signif(section_permanova[["Pr(>F)"]][1], P_SIGFIG),
-        betadisper_p = signif(section_dispersion[["Pr(>F)"]][1], P_SIGFIG)
+# --- Spatial beta diversity among river sections (within season, both dimensions) --------------------------------------
+# Both the taxonomic and the functional dimension are tested, because the manuscript reports them separately: only the
+# functional one differs among sections in spring, and only it shows a dispersion difference in autumn. The functional
+# distance matrix comes from script 03, which is the one place it is built.
+if (!file.exists(FUNCTIONAL_DIST_FILE)) stop("Run 03_beta_diversity.R first (needs functional_distance.csv).")
+functional_matrix <- as.matrix(read.csv(FUNCTIONAL_DIST_FILE, row.names = 1, check.names = FALSE))
+
+#' FDR-corrected pairwise PERMANOVA between every pair of river sections. / 河段两两 PERMANOVA（FDR 校正）。
+#'
+#' An overall section effect does not say which sections differ, and the manuscript names a specific contrast, so the
+#' pairwise tests are run and corrected across the three comparisons within each season and dimension.
+#'
+#' The full permutation count is used, not the quick one. These contrasts land close to the 0.05 threshold, and with
+#' 999 permutations the autumn downstream-tributary result flips between significant and not depending only on the
+#' random draw. A published claim must not depend on the seed, so the tests are run at N_PERM.
+#'
+#' @param distance_matrix Full distance matrix for the season's samples.
+#' @param groups Factor of river sections, aligned to the matrix rows.
+#' @return A list of the per-contrast tibble and a character summary of the FDR-significant contrasts.
+pairwise_sections <- function(distance_matrix, groups) {
+    combinations <- combn(levels(droplevels(groups)), 2, simplify = FALSE)
+    tests <- map(combinations, \(pair) {
+        keep <- groups %in% pair
+        result <- adonis2(as.dist(distance_matrix[keep, keep]) ~ droplevels(groups[keep]),
+                          permutations = N_PERM)
+        tibble(
+            contrast = paste(pair, collapse = "-"),
+            n        = sum(keep),
+            R2       = round(result$R2[1], STAT_DP),
+            p        = result[["Pr(>F)"]][1]
+        )
+    }) |>
+        bind_rows() |>
+        mutate(FDR = p.adjust(p, "BH"))
+
+    significant <- tests$contrast[tests$FDR < FDR_ALPHA]
+    list(
+        tests   = tests,
+        summary = if (length(significant)) paste(significant, collapse = "; ") else "None"
     )
+}
+
+# One entry per season and dimension, each carrying both the overall summary row and its three pairwise contrasts.
+section_results <- map(SEASONS, \(season_name) {
+    season_rows   <- season == season_name
+    season_data   <- season_subset(season_name)
+    river_section <- factor(section[season_rows])
+
+    # Taxonomic and functional, from the same section factor so the two rows are directly comparable.
+    dimensions <- list(
+        Taxonomic  = as.matrix(vegdist(season_data$rel, "bray")),
+        Functional = functional_matrix[season_rows, season_rows]
+    )
+
+    map(names(dimensions), \(dimension_name) {
+        distance_matrix    <- dimensions[[dimension_name]]
+        section_permanova  <- adonis2(as.dist(distance_matrix) ~ river_section, permutations = N_PERM)
+        section_dispersion <- anova(betadisper(as.dist(distance_matrix), river_section))
+        pairwise           <- pairwise_sections(distance_matrix, river_section)
+        list(
+            summary = tibble(
+                dimension       = dimension_name,
+                season          = season_name,
+                PERMANOVA_R2    = round(section_permanova$R2[1], STAT_DP),
+                PERMANOVA_p     = signif(section_permanova[["Pr(>F)"]][1], P_SIGFIG),
+                betadisper_p    = signif(section_dispersion[["Pr(>F)"]][1], P_SIGFIG),
+                fdr_significant = pairwise$summary
+            ),
+            pairwise = pairwise$tests |>
+                mutate(dimension = dimension_name, season = season_name, .before = 1) |>
+                mutate(p = signif(p, P_SIGFIG), FDR = signif(FDR, P_SIGFIG))
+        )
+    })
 }) |>
-    bind_rows()
-cat(NL, "== Spatial beta diversity among sections (taxonomic) ==", NL, sep = "")
+    list_flatten()
+
+sections  <- map(section_results, "summary")  |> bind_rows() |> arrange(dimension, season)
+contrasts <- map(section_results, "pairwise") |> bind_rows() |> arrange(dimension, season, contrast)
+
+cat(NL, "== Spatial beta diversity among sections ==", NL, sep = "")
 print(as.data.frame(sections), row.names = FALSE)
-write.csv(sections, SECTIONS_FILE, row.names = FALSE)
+cat(NL, "-- pairwise contrasts (BH-corrected within each season and dimension) --", NL, sep = "")
+print(as.data.frame(contrasts), row.names = FALSE)
+
+write.csv(sections,  SECTIONS_FILE,  row.names = FALSE)
+write.csv(contrasts, CONTRASTS_FILE, row.names = FALSE)

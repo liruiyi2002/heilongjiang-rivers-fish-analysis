@@ -34,21 +34,52 @@ alpha <- read.csv(ALPHA_SITE_FILE, check.names = FALSE)
 tax_indices  <- c("Richness", "Shannon", "Simpson", "Pielou")
 func_indices <- c("FRic", "FEve", "FDis", "FDiv")
 
-alpha_corr <- expand.grid(tax = tax_indices, fun = func_indices, stringsAsFactors = FALSE) |>
-    as_tibble() |>
-    mutate(
-        rho    = map2_dbl(tax, fun, \(tax_index, func_index)
-            cor(alpha[[tax_index]], alpha[[func_index]], method = "spearman")),
-        p      = map2_dbl(tax, fun, \(tax_index, func_index)
-            cor.test(alpha[[tax_index]], alpha[[func_index]], method = "spearman", exact = FALSE)$p.value),
-        FDR    = p.adjust(p, "BH"),
-        result = if_else(FDR < FDR_ALPHA, "Significant", "Not significant"),
-        rho    = round(rho, STAT_DP),
-        p      = signif(p, P_SIGFIG),
-        FDR    = signif(FDR, P_SIGFIG)
-    )
-cat(NL, "== Alpha-scale taxonomic-functional Spearman (pooled, 26 site-seasons) ==", NL, sep = "")
-print(as.data.frame(alpha_corr), row.names = FALSE)
+#' Spearman correlations between the taxonomic and functional index sets, over one subset of samples.
+#' 在给定样本子集上计算分类与功能指数间的 Spearman 相关。
+#'
+#' FDR correction is applied **within** each scope, because the 16 tests of one scope are the family being
+#' corrected; pooling all 48 across scopes would correct against tests that answer a different question.
+#'
+#' @param scope_name Label for the subset: "Combined", "Spring" or "Autumn".
+#' @param rows Logical vector selecting rows of `alpha`.
+#' @return A tibble of scope, tax, fun, rho, p, FDR and result.
+scope_correlations <- function(scope_name, rows) {
+    subset_alpha <- alpha[rows, ]
+    expand.grid(tax = tax_indices, fun = func_indices, stringsAsFactors = FALSE) |>
+        as_tibble() |>
+        mutate(
+            scope  = scope_name,
+            rho    = map2_dbl(tax, fun, \(tax_index, func_index)
+                cor(subset_alpha[[tax_index]], subset_alpha[[func_index]], method = "spearman")),
+            p      = map2_dbl(tax, fun, \(tax_index, func_index)
+                cor.test(subset_alpha[[tax_index]], subset_alpha[[func_index]],
+                         method = "spearman", exact = FALSE)$p.value),
+            FDR    = p.adjust(p, "BH"),
+            result = if_else(FDR < FDR_ALPHA, "Significant", "Not significant"),
+            rho    = round(rho, STAT_DP),
+            p      = signif(p, P_SIGFIG),
+            FDR    = signif(FDR, P_SIGFIG)
+        ) |>
+        select(scope, tax, fun, rho, p, FDR, result)
+}
+
+# Pooled across seasons, then within each season, which is what the supplementary table reports.
+alpha_corr <- bind_rows(
+    scope_correlations("Combined", rep(TRUE, nrow(alpha))),
+    map(SEASONS, \(season_name) scope_correlations(season_name, alpha$season == season_name))
+)
+
+cat(NL, "== Alpha-scale taxonomic-functional Spearman (pooled and by season) ==", NL, sep = "")
+print(as.data.frame(alpha_corr[alpha_corr$scope == "Combined", ]), row.names = FALSE)
+
+# One line per scope, so it is obvious how much of the coupling survives correction in each.
+alpha_corr |>
+    group_by(scope) |>
+    summarise(significant = sum(FDR < FDR_ALPHA), tests = n(), .groups = "drop") |>
+    mutate(line = glue("  {scope}: {significant} of {tests} significant after FDR")) |>
+    pull(line) |>
+    walk(\(line) cat(line, NL))
+
 write.csv(alpha_corr, ALPHA_TAXFUN_FILE, row.names = FALSE)
 
 
@@ -69,23 +100,42 @@ cat(NL, "== Beta-scale Mantel (Bray-Curtis vs functional CWM distance) ==", NL, 
 cat(glue("  pooled: r = {round(pooled_mantel$statistic, STAT_DP)}, ",
          "p = {sprintf(P_FMT, pooled_mantel$signif)}"), NL)
 
+#' One row of the Mantel table, with the sample and pair counts the test was run on.
+#' Mantel 结果表的一行，附检验所用的样本数与配对数。
+#'
+#' The counts matter for interpretation: a Mantel r from 13 samples and 78 pairs is a weaker claim than the
+#' same r from 26 samples and 325 pairs, so the table states both rather than leaving them implied.
+#'
+#' @param scope_name Label for the subset: "Combined", "Spring" or "Autumn".
+#' @param result A vegan mantel object.
+#' @param sample_count Number of samples the test used.
+#' @return A one-row tibble.
+mantel_row <- function(scope_name, result, sample_count) {
+    tibble(
+        scope        = scope_name,
+        mantel_r     = round(result$statistic, STAT_DP),
+        p            = signif(result$signif, P_SIGFIG),
+        n_samples    = sample_count,
+        n_pairs      = sample_count * (sample_count - 1L) / 2L,
+        permutations = N_PERM,
+        result       = if_else(result$signif < FDR_ALPHA, "Significant", "Not significant")
+    )
+}
+
 seasonal_results <- map(SEASONS, \(season_name) {
-    seasonal_bray   <- vegdist(rel[season == season_name, ], "bray")
-    seasonal_cwm    <- gowdis(cwm[season == season_name, ])
+    seasonal_rows   <- season == season_name
+    seasonal_bray   <- vegdist(rel[seasonal_rows, ], "bray")
+    seasonal_cwm    <- gowdis(cwm[seasonal_rows, ])
     seasonal_mantel <- mantel(seasonal_bray, seasonal_cwm, permutations = N_PERM)
     cat(glue("  {season_name}: r = {round(seasonal_mantel$statistic, STAT_DP)}, ",
              "p = {sprintf(P_FMT, seasonal_mantel$signif)}"), NL)
-    tibble(scope = season_name,
-           mantel_r = round(seasonal_mantel$statistic, STAT_DP),
-           p = signif(seasonal_mantel$signif, P_SIGFIG))
+    mantel_row(season_name, seasonal_mantel, sum(seasonal_rows))
 }) |>
     bind_rows()
 
 # Pooled first, then each season, so the table carries every value quoted in the text.
 bind_rows(
-    tibble(scope = "pooled",
-           mantel_r = round(pooled_mantel$statistic, STAT_DP),
-           p = signif(pooled_mantel$signif, P_SIGFIG)),
+    mantel_row("Combined", pooled_mantel, nrow(rel)),
     seasonal_results
 ) |>
     write.csv(BETA_MANTEL_FILE, row.names = FALSE)

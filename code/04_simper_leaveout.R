@@ -46,11 +46,15 @@ season_means <- vapply(SEASONS, \(season_name) colMeans(rel[season == season_nam
 higher_in    <- ifelse(season_means[rownames(simper_res), AUTUMN] >
                        season_means[rownames(simper_res), SPRING], AUTUMN, SPRING)
 
+# The per-season mean relative sequence abundances are reported alongside the contribution, so a reader can see both
+# how much a taxon separates the seasons and how abundant it actually was in each.
 top_contributors <- tibble(
     taxon            = rownames(simper_res),
+    spring_rsa_pct   = round(100 * season_means[rownames(simper_res), SPRING], PCT_DP),
+    autumn_rsa_pct   = round(100 * season_means[rownames(simper_res), AUTUMN], PCT_DP),
+    higher_in        = unname(higher_in),
     contribution_pct = round(simper_res$share_pct, PCT_DP),
-    cumulative_pct   = round(cumsum(simper_res$share_pct), PCT_DP),
-    higher_in        = unname(higher_in)
+    cumulative_pct   = round(cumsum(simper_res$share_pct), PCT_DP)
 ) |>
     slice_head(n = N_TOP_SIMPER)
 cat(NL, "== SIMPER: top contributors to spring-autumn dissimilarity ==", NL, sep = "")
@@ -79,23 +83,31 @@ cat(glue("Migratory taxa (trait table): {length(migratory)}"), NL)
 #' and re-runs the Bray-Curtis PERMANOVA of composition against season.
 #'
 #' @param drop_taxa Character vector of taxon names to remove (default none).
-#' @return The season R2 from adonis2 for the reduced community.
+#' @return Named numeric vector: the season R2 and its permutation p-value for the reduced community.
 season_r2 <- function(drop_taxa = character()) {
     kept_reads   <- rel[, !colnames(rel) %in% drop_taxa, drop = FALSE]
     nonzero_rows <- rowSums(kept_reads) > 0
     renormalised <- sweep(kept_reads[nonzero_rows, ], 1, rowSums(kept_reads[nonzero_rows, ]), "/")
-    adonis2(vegdist(renormalised, "bray") ~ season[nonzero_rows], permutations = N_PERM_QUICK)$R2[1]
+    result       <- adonis2(vegdist(renormalised, "bray") ~ season[nonzero_rows], permutations = N_PERM_QUICK)
+    c(R2 = result$R2[1], p = result[["Pr(>F)"]][1])
 }
 
-full_r2 <- season_r2()
+# Each scenario keeps its p-value as well as its R2: a reduced R2 that is no longer significant would mean something
+# different from one that is, and the table has to be able to show the difference.
+scenarios <- list(
+    "Full community"               = character(),
+    "Remove chum salmon (O. keta)" = CHUM_SALMON,
+    "Remove autumn indicator taxa" = autumn_indicators,
+    "Remove migratory taxa"        = migratory
+)
+scenario_results <- map(scenarios, season_r2)
+full_r2 <- scenario_results[["Full community"]][["R2"]]
+
 leave_out <- tibble(
-    scenario = c("Full community", "Remove chum salmon (O. keta)",
-                 "Remove autumn indicator taxa", "Remove migratory taxa"),
-    removed  = c(0L, 1L, length(autumn_indicators), length(migratory)),
-    R2       = round(c(full_r2,
-                       season_r2(CHUM_SALMON),
-                       season_r2(autumn_indicators),
-                       season_r2(migratory)), STAT_DP)
+    scenario = names(scenarios),
+    removed  = as.integer(lengths(scenarios)),
+    R2       = round(map_dbl(scenario_results, "R2"), STAT_DP),
+    p        = signif(map_dbl(scenario_results, "p"), P_SIGFIG)
 ) |>
     mutate(reduction_pct = round(100 * (full_r2 - R2) / full_r2, PCT_DP))
 cat(NL, "== Leave-one-out PERMANOVA ==", NL, sep = "")

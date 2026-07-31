@@ -28,6 +28,10 @@ BETA_PARTITION_FUNC_FILE <- file.path(OUT_DIR, "beta_partition_functional.csv")
 PCOA_SCORES_FILE         <- file.path(OUT_DIR, "Fig4_pcoa_scores.csv")
 PCOA_STATS_FILE          <- file.path(OUT_DIR, "Fig4_pcoa_stats.csv")
 
+# The functional distance matrix is expensive to rebuild, and script 06 needs it for the functional half of the
+# spatial-section analysis, so it is written out rather than recomputed there.
+FUNCTIONAL_DIST_FILE     <- file.path(OUT_DIR, "functional_distance.csv")
+
 
 # --- Taxonomic composition: PERMANOVA, dispersion, PCoA ---------------------------------------------------------------
 bray_dist <- vegdist(rel, "bray")
@@ -241,5 +245,6 @@ pcoa_stats <- tibble(
 
 write.csv(pcoa_scores, PCOA_SCORES_FILE, row.names = FALSE)
 write.csv(pcoa_stats,  PCOA_STATS_FILE,  row.names = FALSE)
+write.csv(round(functional_total, DIST_DP), FUNCTIONAL_DIST_FILE)
 cat(NL, "wrote outputs/beta_partition_taxonomic.csv, beta_partition_functional.csv, ",
     "Fig4_pcoa_scores.csv, Fig4_pcoa_stats.csv", NL, sep = "")
