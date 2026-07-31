@@ -24,6 +24,15 @@ counts are integers.
 
 ## How the community data were assembled
 
+**Which pipeline stage these tables come from.** The provider's pipeline resolves amplicon sequence variants with
+DADA2 v1.18.0 and assigns taxonomy by BLASTn against MitoFish. Its own downstream summary tables then apply a
+false-positive filter: within a single sample, any species-level abundance of five reads or fewer is set to zero.
+**That filter was applied to the autumn delivery and not to the spring one**, so the provider's summaries are not
+comparable between seasons. The tables here are built from the **unfiltered** variant output, before that step, which
+is why they retain single-read detections in both seasons in comparable numbers (69 one-read cells in spring, 69 in
+autumn). No minimum-read threshold and no minimum-replicate criterion are applied anywhere in this package.
+
+
 The two sequencing-provider deliveries each hold 13 sites x 3 field replicates. Summed per site they
 give the site-level table (`site_by_species_reads.csv`), and they map to season unambiguously:
 **BZ2023 = spring** (sampled April 2023), **BZ2024 = autumn** (sampled October 2024). Chum salmon
