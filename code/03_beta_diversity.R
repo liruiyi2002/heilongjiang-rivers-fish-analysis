@@ -102,7 +102,7 @@ partition |>
     write.csv(BETA_PARTITION_FILE, row.names = FALSE)
 
 
-# --- Functional beta partition (branch lengths on a UPGMA trait dendrogram) --------------------------------------------
+# --- Functional beta partition (branch lengths on a UPGMA trait dendrogram) -------------------------------------------
 # The functional facet uses the same Sorensen-family partition as the taxonomic one, but measured in trait-dendrogram
 # branch length instead of taxon counts. Two assemblages that hold different taxa occupying the same part of trait
 # space therefore come out functionally similar, which is the point of the comparison.

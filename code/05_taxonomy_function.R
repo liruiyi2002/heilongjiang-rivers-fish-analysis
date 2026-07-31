@@ -26,6 +26,10 @@ ALPHA_TAXFUN_FILE <- file.path(OUT_DIR, "TableS5_taxfun_alpha_spearman.csv")
 BETA_MANTEL_FILE  <- file.path(OUT_DIR, "TableS6_taxfun_beta_mantel.csv")
 BETA_PAIRS_FILE   <- file.path(OUT_DIR, "Fig5_beta_pairs.csv")
 
+# The community-weighted trait means are built here and also needed by 06, which tests functional composition against
+# the environmental gradient. Written out rather than rebuilt, so both scripts use the same matrix.
+CWM_FILE          <- file.path(OUT_DIR, "cwm_by_site_season.csv")
+
 if (!file.exists(ALPHA_SITE_FILE)) stop("Run 02_alpha_diversity.R first.")
 alpha <- read.csv(ALPHA_SITE_FILE, check.names = FALSE)
 
@@ -34,8 +38,7 @@ alpha <- read.csv(ALPHA_SITE_FILE, check.names = FALSE)
 tax_indices  <- c("Richness", "Shannon", "Simpson", "Pielou")
 func_indices <- c("FRic", "FEve", "FDis", "FDiv")
 
-#' Spearman correlations between the taxonomic and functional index sets, over one subset of samples.
-#' 在给定样本子集上计算分类与功能指数间的 Spearman 相关。
+#' Spearman correlations between taxonomic and functional indices, over one subset. / 分类与功能指数间的 Spearman 相关。
 #'
 #' FDR correction is applied **within** each scope, because the 16 tests of one scope are the family being
 #' corrected; pooling all 48 across scopes would correct against tests that answer a different question.
@@ -95,13 +98,14 @@ cwm       <- FD::functcomp(trait_table, reads)
 func_dist <- FD::gowdis(cwm)
 bray_dist <- vegdist(rel, "bray")
 
+write.csv(cwm, CWM_FILE)
+
 pooled_mantel <- mantel(bray_dist, func_dist, method = "pearson", permutations = N_PERM)
 cat(NL, "== Beta-scale Mantel (Bray-Curtis vs functional CWM distance) ==", NL, sep = "")
 cat(glue("  pooled: r = {round(pooled_mantel$statistic, STAT_DP)}, ",
          "p = {sprintf(P_FMT, pooled_mantel$signif)}"), NL)
 
-#' One row of the Mantel table, with the sample and pair counts the test was run on.
-#' Mantel 结果表的一行，附检验所用的样本数与配对数。
+#' One Mantel table row, with the sample and pair counts. / Mantel 结果表的一行，附样本数与配对数。
 #'
 #' The counts matter for interpretation: a Mantel r from 13 samples and 78 pairs is a weaker claim than the
 #' same r from 26 samples and 325 pairs, so the table states both rather than leaving them implied.

@@ -204,8 +204,7 @@ format_p <- function(p, floor_value = 0.001) {
     }, character(1), USE.NAMES = FALSE)
 }
 
-#' Look up display labels, falling back to the original name when none is defined.
-#' 查询显示标签，未定义时回退为原始名称。
+#' Look up display labels, falling back to the original name. / 查询显示标签，未定义时回退为原始名称。
 #'
 #' @param names Character vector of column names.
 #' @param lookup Named character vector of labels (default ENV_LABELS).
@@ -287,8 +286,7 @@ theme_set(theme_journal())
 
 # --- Saving and verification ------------------------------------------------------------------------------------------
 
-#' Write one figure as a TIFF, a PNG and a vector PDF, then verify it against the specification.
-#' 将单个图形输出为 TIFF、PNG 与矢量 PDF，并按规范校验。
+#' Write a figure as TIFF, PNG and vector PDF, then verify it. / 输出图形为 TIFF、PNG 与矢量 PDF 并校验。
 #'
 #' Three files, because three things need them. The TIFF is the Elsevier submission artwork. The PNG is what the
 #' manuscript builders embed into the .docx, so it has to be regenerated alongside the TIFF or the built manuscript

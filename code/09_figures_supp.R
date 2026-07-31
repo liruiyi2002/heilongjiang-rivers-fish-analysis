@@ -104,7 +104,7 @@ figure_s1 <- (figure_s1a / figure_s1b) +
 save_figure(figure_s1, "FigureS1", WIDTH_FULL_MM, 155)
 
 
-# --- Figure S2: local water quality and land cover against diversity -------------------------------------------------
+# --- Figure S2: local water quality and land cover against diversity --------------------------------------------------
 # One heat map per season, over both variable families. Cells are labelled with the correlation and starred only where
 # it survives BH correction within its family, which is what makes the near-absence of real signal visible: the panels
 # are full of moderate correlations and almost no stars.

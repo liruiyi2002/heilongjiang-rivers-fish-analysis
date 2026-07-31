@@ -36,8 +36,13 @@ DBRDA_STATS_FILE   <- file.path(OUT_DIR, "Fig7_dbrda_stats.csv")
 ENV_PAIRS_FILE     <- file.path(OUT_DIR, "Fig8_env_pairs.csv")
 MANTEL_STATS_FILE  <- file.path(OUT_DIR, "Fig8_mantel_stats.csv")
 
-# Written by 03_beta_diversity.R; needed here for the functional half of the spatial-section analysis.
-FUNCTIONAL_DIST_FILE <- file.path(OUT_DIR, "functional_distance.csv")
+VARPART_FILE     <- file.path(OUT_DIR, "TableS10_variation_partitioning.csv")
+FUNC_GRADIENT_FILE <- file.path(OUT_DIR, "TableS11_functional_composition_PC1.csv")
+DECAY_FILE       <- file.path(OUT_DIR, "TableS12_distance_decay.csv")
+
+# Written by earlier scripts; needed here.
+FUNCTIONAL_DIST_FILE <- file.path(OUT_DIR, "functional_distance.csv")   # 03, for the spatial-section analysis
+CWM_FILE             <- file.path(OUT_DIR, "cwm_by_site_season.csv")    # 05, for functional composition vs PC1
 
 EARTH_RADIUS_KM <- 6371   # mean Earth radius, for the haversine distance
 
@@ -230,7 +235,120 @@ if (file.exists(ALPHA_SITE_FILE)) {
 }
 
 
-# --- Spatial beta diversity among river sections (within season, both dimensions) --------------------------------------
+# --- Variation partitioning: season, environment and space ------------------------------------------------------------
+# The envfit and dbRDA results above cannot say whether composition follows the environment or simply follows position
+# along the river, because the river-size gradient *is* spatial. Partitioning the pooled variation into what season,
+# environment and space each explain uniquely answers that directly, and answers it honestly: if the unique
+# environmental fraction is not significant, the two cannot be separated with these data and the paper should say so
+# rather than implying an environmental cause.
+community_distance <- vegdist(rel, "bray")
+
+# One frame holding all three predictor sets, so every model below is built from named columns of the same data. The
+# alternative, a formula with `~ .` plus Condition() on a matrix, does not survive model.matrix().
+SEASON_TERMS <- "season"
+ENV_TERMS    <- ENV_VARS
+SPACE_TERMS  <- c("lon", "lat")
+
+predictors <- cbind(
+    data.frame(season = factor(season)),
+    as.data.frame(scale(env[match(meta$site, rownames(env)), ENV_VARS])),
+    meta[, SPACE_TERMS]
+)
+
+partition <- varpart(community_distance, predictors[SEASON_TERMS], predictors[ENV_TERMS], predictors[SPACE_TERMS])
+fractions <- partition$part$indfract
+
+#' Significance of one unique fraction, conditioning on the other two. / 以另两组为条件检验某一独立部分的显著性。
+#'
+#' @param target_terms Column names of the predictor set being tested.
+#' @param condition_terms Column names to partial out.
+#' @return The permutation p-value.
+unique_fraction_p <- function(target_terms, condition_terms) {
+    model <- dbrda(
+        reformulate(c(target_terms, sprintf("Condition(%s)", condition_terms)), response = "community_distance"),
+        data = predictors
+    )
+    anova(model, permutations = N_PERM_QUICK)[["Pr(>F)"]][1]
+}
+
+variation <- tibble(
+    component = c("Season | environment + space", "Environment | season + space", "Space | season + environment"),
+    adj_R2    = round(fractions$Adj.R.square[1:3], STAT_DP),
+    p         = signif(c(
+        unique_fraction_p(SEASON_TERMS, c(ENV_TERMS, SPACE_TERMS)),
+        unique_fraction_p(ENV_TERMS,    c(SEASON_TERMS, SPACE_TERMS)),
+        unique_fraction_p(SPACE_TERMS,  c(SEASON_TERMS, ENV_TERMS))
+    ), P_SIGFIG)
+)
+
+cat(NL, "== Variation partitioning (pooled, 26 site-seasons) ==", NL, sep = "")
+print(as.data.frame(variation), row.names = FALSE)
+write.csv(variation, VARPART_FILE, row.names = FALSE)
+
+
+# --- Functional composition against the gradient ----------------------------------------------------------------------
+# The taxonomic side of this question is answered above. The functional side is the one the introduction raises and is
+# tested here on the same community-weighted trait means the Mantel test uses, so the two are commensurable.
+if (!file.exists(CWM_FILE)) stop("Run 05_taxonomy_function.R first (needs cwm_by_site_season.csv).")
+cwm_matrix <- read.csv(CWM_FILE, row.names = 1, check.names = FALSE)
+cwm_matrix[] <- lapply(cwm_matrix, \(column) if (is.character(column)) as.factor(column) else column)
+
+functional_gradient <- map(SEASONS, \(season_name) {
+    season_rows <- season == season_name
+    pc1_scores  <- pca$x[match(meta$site[season_rows], rownames(env)), 1]
+    result      <- adonis2(gowdis(cwm_matrix[season_rows, ]) ~ pc1_scores, permutations = N_PERM)
+    tibble(season = season_name,
+           R2     = round(result$R2[1], STAT_DP),
+           p      = result[["Pr(>F)"]][1])
+}) |>
+    bind_rows() |>
+    mutate(FDR = signif(p.adjust(p, "BH"), P_SIGFIG), p = signif(p, P_SIGFIG))
+
+cat(NL, "== Functional composition (Gower on CWM) ~ PC1 ==", NL, sep = "")
+print(as.data.frame(functional_gradient), row.names = FALSE)
+write.csv(functional_gradient, FUNC_GRADIENT_FILE, row.names = FALSE)
+
+
+# --- Distance decay: environment versus geography ---------------------------------------------------------------------
+# The partial Mantel above controls geography when testing environment. Running it the other way round is what shows
+# the asymmetry, and a plain geographic decay model shows how little distance alone accounts for. Reported together so
+# the claim "turnover tracks environment rather than distance" rests on both halves rather than on one.
+decay <- map(SEASONS, \(season_name) {
+    season_data <- season_subset(season_name)
+    season_env  <- season_data$env
+    bray_dist   <- vegdist(season_data$rel, "bray")
+    env_dist    <- dist(scale(season_env[, ENV_VARS]))
+    geo_dist    <- haversine_dist(season_env$lon, season_env$lat)
+    # Distance along the river network, as the difference in distance-from-source between two sites.
+    network_dist <- dist(season_env$dist_source_km)
+
+    environment_given_geography <- mantel.partial(bray_dist, env_dist, geo_dist, permutations = N_PERM)
+    geography_given_environment <- mantel.partial(bray_dist, geo_dist, env_dist, permutations = N_PERM)
+    network_only                <- mantel(bray_dist, network_dist, permutations = N_PERM)
+    geography_only              <- mantel(bray_dist, geo_dist, permutations = N_PERM)
+
+    tibble(
+        season = season_name,
+        test   = c("Community ~ network position", "Community ~ geographic distance",
+                   "Community ~ environment | geography", "Community ~ geography | environment"),
+        mantel_r = round(c(network_only$statistic, geography_only$statistic,
+                           environment_given_geography$statistic, geography_given_environment$statistic), STAT_DP),
+        p        = signif(c(network_only$signif, geography_only$signif,
+                            environment_given_geography$signif, geography_given_environment$signif), P_SIGFIG),
+        # Share of turnover variance a simple linear decay on that distance accounts for.
+        decay_R2 = round(c(summary(lm(as.vector(bray_dist) ~ as.vector(network_dist)))$r.squared,
+                           summary(lm(as.vector(bray_dist) ~ as.vector(geo_dist)))$r.squared,
+                           NA_real_, NA_real_), STAT_DP)
+    )
+}) |>
+    bind_rows()
+
+cat(NL, "== Distance decay: environment versus geography ==", NL, sep = "")
+print(as.data.frame(decay), row.names = FALSE)
+write.csv(decay, DECAY_FILE, row.names = FALSE)
+
+
+# --- Spatial beta diversity among river sections (within season, both dimensions) -------------------------------------
 # Both the taxonomic and the functional dimension are tested, because the manuscript reports them separately: only the
 # functional one differs among sections in spring, and only it shows a dispersion difference in autumn. The functional
 # distance matrix comes from script 03, which is the one place it is built.

@@ -71,7 +71,7 @@ season_locals <- function(season_name, site_ids) {
 }
 
 
-# --- Local variables vs alpha diversity (Spearman, within season, BH-FDR) ----------------------------------------------
+# --- Local variables vs alpha diversity (Spearman, within season, BH-FDR) ---------------------------------------------
 
 #' Alpha x local-variable Spearman correlations for one season. / 单季节 alpha 指标与局地变量的 Spearman 相关。
 #'
@@ -116,7 +116,7 @@ for (family_name in c(WATER_QUALITY, LAND_COVER)) {
 }
 
 
-# --- Composition vs the local variables (dbRDA, within season) ---------------------------------------------------------
+# --- Composition vs the local variables (dbRDA, within season) --------------------------------------------------------
 # Four models in total, one per variable family per season. These are the models the manuscript reports as
 # non-significant, so each is tested explicitly rather than inferred from the correlations above.
 
