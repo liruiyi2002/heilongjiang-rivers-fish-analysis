@@ -22,12 +22,14 @@ set.seed(RANDOM_SEED)
 
 # Output files written by this script (ALPHA_SITE_FILE is defined in 00_setup.R). The Fig. 5 file holds one row per
 # sample pair, which is what panel B plots, so the scatter and the Mantel statistic come from the same numbers.
+# 本脚本的输出文件；图 5 的文件按样本对逐行记录，使散点与 Mantel 统计量同源。
 ALPHA_TAXFUN_FILE <- file.path(OUT_DIR, "TableS5_taxfun_alpha_spearman.csv")
 BETA_MANTEL_FILE  <- file.path(OUT_DIR, "TableS6_taxfun_beta_mantel.csv")
 BETA_PAIRS_FILE   <- file.path(OUT_DIR, "Fig5_beta_pairs.csv")
 
 # The community-weighted trait means are built here and also needed by 06, which tests functional composition against
 # the environmental gradient. Written out rather than rebuilt, so both scripts use the same matrix.
+# 群落加权性状均值在此构建，脚本 06 亦需使用，故写出文件以共用同一矩阵。
 CWM_FILE          <- file.path(OUT_DIR, "cwm_by_site_season.csv")
 
 if (!file.exists(ALPHA_SITE_FILE)) stop("Run 02_alpha_diversity.R first.")
@@ -67,6 +69,7 @@ scope_correlations <- function(scope_name, rows) {
 }
 
 # Pooled across seasons, then within each season, which is what the supplementary table reports.
+# 先合并各季节，再分季节计算，与补充表的呈现一致。
 alpha_corr <- bind_rows(
     scope_correlations("Combined", rep(TRUE, nrow(alpha))),
     map(SEASONS, \(season_name) scope_correlations(season_name, alpha$season == season_name))
@@ -76,6 +79,7 @@ cat(NL, "== Alpha-scale taxonomic-functional Spearman (pooled and by season) =="
 print(as.data.frame(alpha_corr[alpha_corr$scope == "Combined", ]), row.names = FALSE)
 
 # One line per scope, so it is obvious how much of the coupling survives correction in each.
+# 每个范围一行，便于看出校正后仍显著的耦合数量。
 alpha_corr |>
     group_by(scope) |>
     summarise(significant = sum(FDR < FDR_ALPHA), tests = n(), .groups = "drop") |>
@@ -88,6 +92,7 @@ write.csv(alpha_corr, ALPHA_TAXFUN_FILE, row.names = FALSE)
 
 # --- Beta scale: Mantel between compositional and functional dissimilarity --------------------------------------------
 # Functional distance = Gower distance among community-weighted trait means (CWM).
+# 功能距离 = 群落加权性状均值（CWM）间的 Gower 距离。
 trait_columns  <- c("Diet", "Mouth position", "Trophic level", "Water layer", "Migration type",
                     "Body shape", "Max body length (cm)", "Egg ecological type", "Resilience")
 trait_table    <- traits[colnames(reads), trait_columns]     # keep species as row names
@@ -138,6 +143,7 @@ seasonal_results <- map(SEASONS, \(season_name) {
     bind_rows()
 
 # Pooled first, then each season, so the table carries every value quoted in the text.
+# 先合并再分季节，使表中涵盖正文引用的全部数值。
 bind_rows(
     mantel_row("Combined", pooled_mantel, nrow(rel)),
     seasonal_results
@@ -149,6 +155,7 @@ bind_rows(
 # One row per sample pair, holding the two dissimilarities the Mantel test compares. Panel B is a scatter of exactly
 # these columns, so the cloud of points and the reported r describe the same comparison. Whether a pair is within or
 # between seasons is carried too, since that is the structure the pooled correlation is built on.
+# 按样本对逐行记录 Mantel 所比较的两种相异性；面板 B 即为该两列的散点。
 pair_index  <- which(lower.tri(as.matrix(bray_dist)), arr.ind = TRUE)
 sample_ids  <- rownames(as.matrix(bray_dist))
 

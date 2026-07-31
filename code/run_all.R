@@ -24,6 +24,7 @@
 code_dir <- if (length(.file)) dirname(gsub("~\\+~", " ", .file)) else "code"
 
 # Analysis first, then figures: 08 and 09 read only what 01-07 have written, so the order matters.
+# 先分析后绘图：08 与 09 仅读取 01-07 写出的文件，故顺序不可颠倒。
 scripts <- c(
     "01_composition.R",
     "02_alpha_diversity.R",

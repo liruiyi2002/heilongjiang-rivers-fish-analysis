@@ -23,6 +23,7 @@ set.seed(RANDOM_SEED)
 
 # Output files written by this script. The three Fig. 4 files carry the plot-ready coordinates and statistics, so the
 # figure is drawn from exactly the numbers reported here and cannot drift away from them.
+# 本脚本的输出文件；图 4 的三个文件含绘图坐标与统计量，确保图与所报告数值一致。
 BETA_PARTITION_FILE      <- file.path(OUT_DIR, "beta_partition_taxonomic.csv")
 BETA_PARTITION_FUNC_FILE <- file.path(OUT_DIR, "beta_partition_functional.csv")
 PCOA_SCORES_FILE         <- file.path(OUT_DIR, "Fig4_pcoa_scores.csv")
@@ -30,6 +31,7 @@ PCOA_STATS_FILE          <- file.path(OUT_DIR, "Fig4_pcoa_stats.csv")
 
 # The functional distance matrix is expensive to rebuild, and script 06 needs it for the functional half of the
 # spatial-section analysis, so it is written out rather than recomputed there.
+# 功能距离矩阵计算代价高，且脚本 06 亦需使用，故写出文件而非重复计算。
 FUNCTIONAL_DIST_FILE     <- file.path(OUT_DIR, "functional_distance.csv")
 
 
@@ -50,6 +52,7 @@ cat(glue("betadisper: F = {round(dispersion_test[['F value']][1], STAT_DP)}, ",
 # eigenvalues alone overstates each axis. A Lingoes correction removes the negative eigenvalues, and its relative
 # corrected eigenvalues are the percentages reported here and on the Fig. 4 axes. The same convention is applied to
 # the functional ordination below, so the two panels are directly comparable.
+# Bray-Curtis 非欧氏，特征值含负值，仅按正特征值取比例会高估各轴；故采用 Lingoes 校正。
 pcoa              <- ape::pcoa(bray_dist, correction = "lingoes")
 taxonomic_percent <- 100 * pcoa$values$Rel_corr_eig[1:2]
 cat(glue("PCoA axes 1-2 variance (Lingoes-corrected): ",
@@ -91,6 +94,7 @@ partition <- map(unique(meta$site), partition_site) |> bind_rows()
 cat(NL, "== Taxonomic beta partition (paired, mean +/- SD across 13 sites) ==", NL, sep = "")
 
 # Print the across-site mean +/- SD for each partition component.
+# 打印各分解成分在站点间的均值 ± 标准差。
 walk(c("total", "turnover", "nestedness"), \(component) {
     values <- partition[[component]]
     cat(glue("  {str_pad(component, 11, 'right')} ",
@@ -113,10 +117,12 @@ partition |>
 #   nestedness = total - turnover
 # The three quantities are obtained from the length spanned by each assemblage and by their union, which is all that
 # is needed and avoids a dependency on betapart.
+# 功能层面沿用同一 Sorensen 族分解，但以性状树枝长而非类群计数度量。
 functional_tree <- ape::as.phylo(hclust(gower_dist, method = "average"))     # UPGMA functional dendrogram
 
 # Tip set below every edge, accumulated in one leaves-to-root sweep so that spanned_length() is a lookup rather than a
 # repeated tree walk. Without this the 325 site-season pairs take minutes instead of seconds.
+# 自叶至根一次遍历缓存各边下方的叶集合，使枝长查询无需重复遍历树。
 edge_tip_sets <- vector("list", max(functional_tree$edge))
 for (row_index in rev(seq_len(nrow(functional_tree$edge)))) {
     parent_node <- functional_tree$edge[row_index, 1]
@@ -150,6 +156,7 @@ sample_tips <- function(sample_name) {
 }
 
 # Spanned length per sample, computed once; there are only 26.
+# 各样本的跨越枝长仅计算一次，共 26 个样本。
 sample_spanned <- vapply(rownames(presence_absence), \(s) spanned_length(sample_tips(s)), numeric(1))
 
 #' Sorensen-family functional partition between two samples. / 两样本间功能 beta 的 Sorensen 族分解。
@@ -169,6 +176,7 @@ functional_partition_pair <- function(first_sample, second_sample) {
 }
 
 # Paired spring-versus-autumn partition at each site, matching the taxonomic partition above.
+# 各站点春秋配对分解，与上文分类学分解一致。
 functional_partition <- map(unique(meta$site), \(site_name) {
     components <- functional_partition_pair(paste0(SPRING, NAME_SEP, site_name),
                                             paste0(AUTUMN, NAME_SEP, site_name))
@@ -191,6 +199,7 @@ functional_partition |>
 
 # --- Functional composition: PERMANOVA, dispersion, PCoA --------------------------------------------------------------
 # The full pairwise total-functional-beta matrix, which is the functional counterpart of bray_dist.
+# 全部两两功能 beta 总量矩阵，即 bray_dist 的功能学对应物。
 sample_names     <- rownames(presence_absence)
 functional_total <- matrix(0, length(sample_names), length(sample_names),
                            dimnames = list(sample_names, sample_names))
@@ -221,6 +230,7 @@ cat(glue("PCoA axes 1-2 variance (Lingoes-corrected): ",
 # --- Plot-ready coordinates and statistics for Fig. 4 -----------------------------------------------------------------
 # Corrected coordinates go with the corrected percentages, so each panel's points and axis labels describe the same
 # ordination. The correction shifts the coordinates only in the third decimal, so the picture is unchanged.
+# 校正后的坐标与校正后的百分比配套，使各面板的点与坐标轴描述同一次排序。
 pcoa_scores <- bind_rows(
     tibble(facet = "Taxonomic", sample = rownames(pcoa$vectors.cor),
            axis1 = pcoa$vectors.cor[, 1], axis2 = pcoa$vectors.cor[, 2]),

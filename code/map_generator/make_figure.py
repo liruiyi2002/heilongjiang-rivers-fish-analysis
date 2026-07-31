@@ -719,6 +719,11 @@ def save_figure(image: Image.Image, path: Path, dpi: int) -> None:
 
     if path.suffix.lower() in (".tif", ".tiff"):
         image.save(path, dpi=(dpi, dpi), compression="tiff_lzw")
+    elif path.suffix.lower() == ".pdf":
+        # PDF here is a page-sized container around the same raster, for reading copies and for embedding. It is not
+        # a vector drawing, so TIFF remains the file to submit: publishers ask for EPS or PDF for vector artwork and
+        # for TIFF for raster, and this map is raster.
+        image.convert("RGB").save(path, resolution=float(dpi))
     else:
         image.save(path, dpi=(dpi, dpi))
 
@@ -753,6 +758,7 @@ def main() -> int:
 
         png, _, _ = render_figure(_SUBMISSION_PNG_DPI, _SUPERSAMPLE_PRINT)
         save_figure(png, OUTPUT_DIR / "Figure1.png", _SUBMISSION_PNG_DPI)
+        save_figure(png, OUTPUT_DIR / "Figure1.pdf", _SUBMISSION_PNG_DPI)
     else:
         proof, metrics, audits = render_figure(_REVIEW_DPI, _SUPERSAMPLE_REVIEW)
         save_figure(proof, OUTPUT_DIR / "Figure1_review.png", _REVIEW_DPI)

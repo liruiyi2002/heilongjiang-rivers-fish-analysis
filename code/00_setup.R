@@ -19,6 +19,7 @@
 # iNEXT (sample coverage), indicspecies (IndVal.g), cluster (Gower distance),
 # ape (trait dendrogram and corrected PCoA for the functional beta partition);
 # dplyr / tidyr / purrr / stringr / glue (tidy data manipulation and strings).
+# 以上为分析所需 R 包：生态学统计、功能多样性、覆盖度、指示种、性状距离与数据整理。
 required_packages <- c("vegan", "FD", "iNEXT", "indicspecies", "cluster", "ape",
                        "dplyr", "tidyr", "purrr", "stringr", "glue")
 missing_packages <- setdiff(required_packages, rownames(installed.packages()))
@@ -95,6 +96,7 @@ read_data <- function(file_name, ...) read.csv(file.path(DATA_DIR, file_name), c
 
 # --- Site-level community table (26 site-seasons x 100 taxa) ----------------------------------------------------------
 # Reads summed across the three field replicates per site (see replicate table).
+# 站点级读数为每站三个野外重复之和。
 reads <- as.matrix(read_data(SITE_READS_FILE, row.names = 1))
 
 meta <- read_data(SITE_METADATA_FILE, stringsAsFactors = FALSE)
@@ -111,9 +113,11 @@ presence_absence <- (reads > 0) * 1L                          # presence-absence
 # --- Replicate-level table (78 samples x 100 taxa) --------------------------------------------------------------------
 # Three replicates per site per season; sums exactly to the site-level table.
 # Used for incidence-based sample coverage. Row names are Season_Site_replicate.
+# 每站每季三个重复；求和后与站点级表完全一致。
 replicate_reads <- as.matrix(read_data(REPLICATE_READS_FILE, row.names = 1))
 
 # Row names look like "Spring_W01_1" -> split into season / site / replicate.
+# 行名形如 Spring_W01_1，据此拆分为季节 / 站点 / 重复。
 name_parts     <- str_split_fixed(rownames(replicate_reads), NAME_SEP, 3)
 replicate_meta <- data.frame(
     sample = rownames(replicate_reads),
@@ -139,18 +143,21 @@ gower_dist <- read_data(GOWER_DIST_FILE, row.names = 1) |>
 # --- Environment ------------------------------------------------------------------------------------------------------
 # Hydro-geographic descriptors (13 sites) drive the main gradient analysis
 # (Figs 6-8); water quality and land cover back the supplementary Fig. S2 only.
+# 水文—地理描述量（13 站点），主梯度分析的输入。
 env <- read_data(SITE_ENV_FILE, stringsAsFactors = FALSE)
 rownames(env) <- env$site
 ENV_VARS <- c("elev_m", "strahler", "log_drainage", "log_discharge", "log_width",
               "grad_dem", "dist_source_km", "dist_mouth_km", "MAT_C", "MAP_mm")
 
 # Water quality is measured once per site AND season, so it is kept long and joined on both keys.
+# 水质按站点与季节各测一次，故保持长表并按双键合并。
 water_quality      <- read_data(WATER_QUALITY_FILE, stringsAsFactors = FALSE)
 WATER_QUALITY_VARS <- c("temperature_C", "pH", "conductivity_uS_cm", "dissolved_oxygen_mg_L",
                         "total_phosphorus_mg_L", "total_nitrogen_mg_L", "ammonia_nitrogen_mg_L")
 
 # Land cover is a fixed site property (shares of the classified area in a 2 km buffer), so one row per site.
 # The pixel count and buffer area travel with the table for transparency but are not analysis variables.
+# 土地覆被为站点固定属性（2 km 缓冲区内各类占比），每站一行。
 land_use      <- read_data(LAND_USE_FILE, row.names = 1)
 LAND_USE_VARS <- c("cropland", "forest", "shrub", "grassland", "water", "snow_ice", "barren",
                    "impervious", "wetland")

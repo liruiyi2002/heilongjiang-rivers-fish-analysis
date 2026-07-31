@@ -22,6 +22,7 @@ source(file.path(.dir, "00_setup.R"))
 set.seed(RANDOM_SEED)
 
 # Output files written by this script (ALPHA_SITE_FILE is defined in 00_setup.R).
+# 本脚本的输出文件（ALPHA_SITE_FILE 在 00_setup.R 中定义）。
 LOCAL_CORR_FILE  <- file.path(OUT_DIR, "TableS8_local_alpha_spearman.csv")
 LOCAL_DBRDA_FILE <- file.path(OUT_DIR, "TableS9_local_dbrda.csv")
 
@@ -38,6 +39,7 @@ alpha_indices <- c("Richness", "Shannon", "Simpson", "Pielou", "FRic", "FEve", "
 # --- Drop classes that carry no signal --------------------------------------------------------------------------------
 # A land-cover class absent from every buffer has zero variance, so a correlation with it is undefined rather than
 # null. Those classes are reported and excluded so the test count reflects what was actually testable.
+# 在所有缓冲区内均缺失的土地覆被类别方差为零，相关系数无定义，故予剔除。
 
 land_use_constant <- LAND_USE_VARS[map_lgl(LAND_USE_VARS, \(class_name) sd(land_use[[class_name]]) == 0)]
 land_use_vars     <- setdiff(LAND_USE_VARS, land_use_constant)
@@ -119,6 +121,7 @@ for (family_name in c(WATER_QUALITY, LAND_COVER)) {
 # --- Composition vs the local variables (dbRDA, within season) --------------------------------------------------------
 # Four models in total, one per variable family per season. These are the models the manuscript reports as
 # non-significant, so each is tested explicitly rather than inferred from the correlations above.
+# 共四个模型，每季节各变量族一个，即稿件所报告者。
 
 #' dbRDA of composition on one variable family in one season. / 单季节、单一变量族的组成 dbRDA。
 #'

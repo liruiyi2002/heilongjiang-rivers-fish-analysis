@@ -53,11 +53,13 @@ cat(NL, "== Supplementary figures / 补充插图 ==", NL, sep = "")
 # more abundant in, because a contribution says how much a taxon separates the seasons but not in which direction.
 # Panel B removes those taxa and re-runs the seasonal test, which turns "these taxa differ" into "the seasonal signal
 # depends on them by this much".
+# 面板 A 按对季节间平均相异性的贡献排序类群，并按其更丰富的季节着色。
 simper   <- read_output("TableS2_simper_top15.csv",         "04_simper_leaveout.R")
 leaveout <- read_output("TableS3_leaveout_permanova.csv",   "04_simper_leaveout.R")
 
 # Where the cumulative share first reaches half of the total dissimilarity, stated on the panel so the reader does not
 # have to add the bars up.
+# 累计贡献首次达到总相异性一半的位置，标于面板上以免读者自行累加。
 half_at <- which(simper$cumulative_pct >= 50)[1]
 
 figure_s1a <- simper |>
@@ -79,6 +81,7 @@ figure_s1b <- leaveout |>
     mutate(
         scenario = factor(scenario, levels = scenario),
         # The full-community bar is the reference, so its reduction is not labelled as a drop.
+        # 全群落柱为参照，故其降幅不作为下降标注。
         label    = if_else(reduction_pct < 1,
                            sprintf("R² = %.3f", R2),
                            sprintf("R² = %.3f\n(-%.1f%%)", R2, reduction_pct))
@@ -90,6 +93,7 @@ figure_s1b <- leaveout |>
     scale_y_continuous(expand = expansion(mult = c(0, 0.22))) +
     # The scenario names are sentences, and set on one line they run into each other. Wrapping to a fixed character
     # width keeps each label under its own bar.
+    # 情景名称为完整短语，单行排布会互相重叠，故按固定字符宽度换行。
     scale_x_discrete(labels = scales::label_wrap(18)) +
     labs(x = NULL, y = "Seasonal PERMANOVA R²",
          title = "Dependence of the seasonal signal on these taxa") +
@@ -97,6 +101,7 @@ figure_s1b <- leaveout |>
 
 # The legend is collected to the foot of the figure. Left inside panel A it would take width from that panel only, and
 # patchwork would then inset panel B to match, leaving an empty column beside it.
+# 图例合并置于图脚；若留在面板 A 内会仅占用该面板宽度，使面板 B 被内缩。
 figure_s1 <- (figure_s1a / figure_s1b) +
     plot_layout(heights = c(1.35, 1), guides = "collect") +
     plot_annotation(tag_levels = "A") &
@@ -108,11 +113,13 @@ save_figure(figure_s1, "FigureS1", WIDTH_FULL_MM, 155)
 # One heat map per season, over both variable families. Cells are labelled with the correlation and starred only where
 # it survives BH correction within its family, which is what makes the near-absence of real signal visible: the panels
 # are full of moderate correlations and almost no stars.
+# 每季节一个热图，涵盖两个变量族；单元格标注相关系数，仅族内校正后显著者加星。
 local_corr <- read_output("TableS8_local_alpha_spearman.csv", "07_water_quality_supp.R")
 local_dbrda <- read_output("TableS9_local_dbrda.csv",         "07_water_quality_supp.R")
 
 # Rows are ordered water quality first, then land cover, each in the order the data tables declare them, so the two
 # families read as blocks rather than being interleaved alphabetically.
+# 行序先水质、后土地覆被，各按数据表声明顺序，使两族成块呈现。
 variable_order <- intersect(names(LOCAL_LABELS), unique(local_corr$variable))
 index_order    <- unique(local_corr$alpha)
 
@@ -133,6 +140,7 @@ correlation_panel <- function(season_name, show_legend) {
         geom_tile(colour = "white", linewidth = 0.3) +
         # With 120 cells per panel a trailing asterisk is far too easy to miss, and in this figure the whole point is
         # that almost nothing is significant - so the one cell that is has to be unmistakable.
+        # 每面板 120 个单元格，仅靠末尾星号极易漏看，而本图的要点正是几无显著项。
         significance_layers(panel_data, panel_data$FDR < FDR_ALPHA, BASE_PT) +
         scale_fill_gradient2(low = DIVERGING_LOW, mid = DIVERGING_MID, high = DIVERGING_HIGH,
                              midpoint = 0, limits = c(-1, 1), name = "Spearman ρ",
@@ -150,6 +158,7 @@ correlation_panel <- function(season_name, show_legend) {
 
 # The dbRDA results belong with this figure, so they are stated in the caption strip rather than left only in Table S9.
 # The note is wrapped, because set as one line it overflows the 190 mm width and the device silently clips the end.
+# dbRDA 结果与本图同属一事，故写入题注而不仅留于表 S9。
 dbrda_note <- local_dbrda |>
     mutate(text = sprintf("%s %s adj. R² = %.3f, P = %s", season, tolower(family), adj_R2, format_p(p))) |>
     pull(text) |>

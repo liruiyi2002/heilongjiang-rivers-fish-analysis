@@ -20,6 +20,7 @@ source(file.path(.dir, "00_setup.R"))
 set.seed(RANDOM_SEED)
 
 # Output files written by this script, plus a few analysis parameters.
+# 本脚本的输出文件及若干分析参数。
 SIMPER_FILE    <- file.path(OUT_DIR, "TableS2_simper_top15.csv")
 LEAVEOUT_FILE  <- file.path(OUT_DIR, "TableS3_leaveout_permanova.csv")
 READSHARE_FILE <- file.path(OUT_DIR, "TableS4_migratory_readshare.csv")
@@ -36,11 +37,13 @@ simper_res <- simper_res[order(-simper_res$average), ]
 # Bray-Curtis dissimilarity between the seasons. A taxon's percentage contribution is therefore its share of that
 # total, which is the quantity SIMPER results are conventionally reported as. Multiplying the raw average by 100
 # would give a number on the wrong scale.
+# vegan 给出的 average 以相异性为单位，其总和等于季节间平均 Bray-Curtis；百分比应为占该总量的份额。
 overall_dissimilarity <- sum(simper_res$average)
 simper_res$share_pct  <- 100 * simper_res$average / overall_dissimilarity
 
 # Which season a taxon is more abundant in. It is not part of the SIMPER statistic, but a contribution says only how
 # much a taxon separates the seasons, not which way, so Fig. S1A colours each bar by direction.
+# 类群在哪个季节更丰富。贡献度只说明分异程度，不说明方向，故另行标注。
 season_means <- vapply(SEASONS, \(season_name) colMeans(rel[season == season_name, , drop = FALSE]),
                        numeric(ncol(rel)))
 higher_in    <- ifelse(season_means[rownames(simper_res), AUTUMN] >
@@ -48,6 +51,7 @@ higher_in    <- ifelse(season_means[rownames(simper_res), AUTUMN] >
 
 # The per-season mean relative sequence abundances are reported alongside the contribution, so a reader can see both
 # how much a taxon separates the seasons and how abundant it actually was in each.
+# 同时报告各季节平均相对序列丰度，使读者既见分异贡献亦见实际丰度。
 top_contributors <- tibble(
     taxon            = rownames(simper_res),
     spring_rsa_pct   = round(100 * season_means[rownames(simper_res), SPRING], PCT_DP),
@@ -94,6 +98,7 @@ season_r2 <- function(drop_taxa = character()) {
 
 # Each scenario keeps its p-value as well as its R2: a reduced R2 that is no longer significant would mean something
 # different from one that is, and the table has to be able to show the difference.
+# 各情景同时保留 p 值：R2 下降后是否仍显著，含义不同。
 scenarios <- list(
     "Full community"               = character(),
     "Remove chum salmon (O. keta)" = CHUM_SALMON,

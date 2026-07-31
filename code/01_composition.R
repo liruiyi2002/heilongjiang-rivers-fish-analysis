@@ -19,9 +19,13 @@
 source(file.path(.dir, "00_setup.R"))
 
 # Output files written by this script, and the size of the "most abundant" summaries.
+# 本脚本的输出文件，以及优势类群汇总的条目数。
 TOP_TAXA_FILE   <- file.path(OUT_DIR, "Table_top_abundant_taxa.csv")
 OCCURRENCE_FILE <- file.path(OUT_DIR, "Fig2_seasonal_occurrence.csv")
 SHARES_FILE     <- file.path(OUT_DIR, "Fig2_composition_shares.csv")
+# The asymptotic-completeness figures are quoted in the Results, so they are written out rather than only printed.
+# 渐近完整度数值在结果中被引用，故写出文件而非仅打印。
+COMPLETENESS_FILE <- file.path(OUT_DIR, "TableS13_asymptotic_completeness.csv")
 TOP_N           <- 10
 
 cat(NL, "== Community composition / 群落组成 ==", NL, sep = "")
@@ -29,6 +33,7 @@ cat(glue("Total valid fish reads: {format(sum(reads), big.mark = ',')}"), NL)
 cat(glue("Taxa detected: {ncol(reads)}"), NL)
 
 # Order / family / genus counts, read from the shipped taxonomy table.
+# 目 / 科 / 属计数，取自随包提供的分类表。
 ranks <- taxonomy[colnames(reads), ]
 cat(glue("Orders: {n_distinct(ranks$order)} | ",
          "Families: {n_distinct(ranks$family)} | ",
@@ -77,6 +82,7 @@ print(coverage$DataInfo[, c("Assemblage", "SC")])
 
 # Observed richness as a share of the Chao asymptotic estimate. Coverage says how much of the community's
 # abundance was sampled; this says how much of its richness was, which is the quantity the manuscript quotes.
+# 观测丰富度占 Chao 渐近估计的比例：覆盖度衡量丰度采样程度，此处衡量丰富度采样程度。
 completeness <- map(SEASONS, \(season_name) {
     estimate <- ChaoRichness(frequencies[[season_name]], datatype = "incidence_freq")
     tibble(
@@ -90,6 +96,7 @@ completeness <- map(SEASONS, \(season_name) {
 
 cat(NL, "Observed richness as a share of the Chao asymptotic estimate:", NL, sep = "")
 print(as.data.frame(completeness), row.names = FALSE)
+write.csv(completeness, COMPLETENESS_FILE, row.names = FALSE)
 
 
 # --- Most sequence-abundant taxa per season ---------------------------------------------------------------------------
@@ -136,6 +143,7 @@ occurrence <- tibble(taxon = union(spring_taxa, autumn_taxa)) |>
 # Panel B stacks the taxa that are dominant in at least one season, so a taxon abundant only in autumn still appears in
 # the spring bar at its true (small) share. Everything outside that set is pooled into one remainder band, which keeps
 # the bars summing to 100% without a legend of 100 entries.
+# 图 2B 堆叠至少在一个季节占优的类群，其余合并为“其他”，使柱状图合计为 100%。
 named_taxa <- union(
     top_taxa(SPRING)$taxon,
     top_taxa(AUTUMN)$taxon
@@ -157,6 +165,7 @@ composition_shares <- function(season_name) {
 
 # Ordered by pooled abundance so the stacking order is stable and the legend reads largest-first, with the remainder
 # band last regardless of its size.
+# 按合并丰度排序，确保堆叠顺序稳定、图例自大到小，“其他”始终置末。
 taxon_order <- names(sort(colSums(reads)[named_taxa], decreasing = TRUE))
 
 shares <- map(SEASONS, composition_shares) |>
@@ -172,5 +181,5 @@ cat(glue("{NL}Fig. 2B: {length(named_taxa)} named taxa plus a pooled remainder")
 write.csv(top_taxa_table, TOP_TAXA_FILE,   row.names = FALSE)
 write.csv(occurrence,     OCCURRENCE_FILE, row.names = FALSE)
 write.csv(shares,         SHARES_FILE,     row.names = FALSE)
-cat(NL, "wrote outputs/Table_top_abundant_taxa.csv, Fig2_seasonal_occurrence.csv, Fig2_composition_shares.csv",
-    NL, sep = "")
+cat(NL, "wrote outputs/Table_top_abundant_taxa.csv, Fig2_seasonal_occurrence.csv, Fig2_composition_shares.csv, ",
+    "TableS13_asymptotic_completeness.csv", NL, sep = "")

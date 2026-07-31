@@ -24,6 +24,7 @@ set.seed(RANDOM_SEED)
 # Output files written by this script (ALPHA_SITE_FILE is defined in 00_setup.R). The Fig. 6-8 files carry the
 # plot-ready ordination coordinates, arrow coordinates and pair lists, so each figure is drawn from the same numbers
 # this script reports rather than from a second, independent computation.
+# 本脚本的输出文件；图 6-8 的文件含排序坐标、箭头坐标与样本对清单。
 ALPHA_PC1_FILE <- file.path(OUT_DIR, "alpha_vs_PC1.csv")
 SECTIONS_FILE  <- file.path(OUT_DIR, "TableS7_spatial_sections.csv")
 CONTRASTS_FILE <- file.path(OUT_DIR, "TableS7b_section_contrasts.csv")
@@ -39,8 +40,13 @@ MANTEL_STATS_FILE  <- file.path(OUT_DIR, "Fig8_mantel_stats.csv")
 VARPART_FILE     <- file.path(OUT_DIR, "TableS10_variation_partitioning.csv")
 FUNC_GRADIENT_FILE <- file.path(OUT_DIR, "TableS11_functional_composition_PC1.csv")
 DECAY_FILE       <- file.path(OUT_DIR, "TableS12_distance_decay.csv")
+# Composition against PC1 and the envfit correlates are quoted in the Results, so both are written out rather than
+# only printed. / 组成对 PC1 与 envfit 相关量在结果中被引用，故一并写出文件。
+PC1_PERMANOVA_FILE <- file.path(OUT_DIR, "TableS14_composition_PC1.csv")
+ENVFIT_FILE        <- file.path(OUT_DIR, "TableS15_envfit.csv")
 
 # Written by earlier scripts; needed here.
+# 由前序脚本写出、本脚本需要读取的文件。
 FUNCTIONAL_DIST_FILE <- file.path(OUT_DIR, "functional_distance.csv")   # 03, for the spatial-section analysis
 CWM_FILE             <- file.path(OUT_DIR, "cwm_by_site_season.csv")    # 05, for functional composition vs PC1
 
@@ -48,6 +54,7 @@ EARTH_RADIUS_KM <- 6371   # mean Earth radius, for the haversine distance
 
 # The hydro-geographic predictors entered into the dbRDA, kept in one place because both the model and its arrow
 # labels are built from it.
+# 进入 dbRDA 的水文—地理预测变量，集中定义以供模型与箭头标签共用。
 DBRDA_VARS <- c("elev_m", "strahler", "log_discharge", "log_width", "grad_dem", "dist_source_km")
 
 
@@ -61,6 +68,7 @@ cat("PC1 loadings:", NL, sep = "")
 print(round(sort(pca$rotation[, 1]), STAT_DP))
 
 # Plot-ready PCA for Fig. 6: site scores with their river section, variable loadings, and the variance per axis.
+# 图 6 所需的 PCA 绘图数据：站点得分与河段、变量载荷、各轴方差。
 tibble(
     site    = rownames(pca$x),
     section = as.character(section[match(rownames(pca$x), meta$site)]),
@@ -111,18 +119,28 @@ haversine_dist <- function(lon, lat) {
 # --- Environment-community relationships, within each season (n = 13) -------------------------------------------------
 # The per-season results are collected rather than only printed, because Figs 7 and 8 are drawn from them. Each season
 # contributes its dbRDA ordination, its arrow coordinates, and its full list of site pairs.
+# 逐季节结果予以收集而非仅打印，因图 7、8 由其绘制。
 gradient_results <- map(SEASONS, \(season_name) {
     season_data <- season_subset(season_name)
     season_env  <- season_data$env
     bray_dist   <- vegdist(season_data$rel, "bray")
     pc1_scores  <- pca$x[match(season_data$site_ids, rownames(env)), 1]
 
-    # Composition ~ PC1
-    pc1_permanova <- adonis2(bray_dist ~ pc1_scores, permutations = N_PERM)
+    # Composition ~ PC1, plus the dispersion check that the Results report alongside it.
+    # 组成对 PC1，并附结果中一并报告的离散度检验。
+    pc1_permanova  <- adonis2(bray_dist ~ pc1_scores, permutations = N_PERM)
+    pc1_dispersion <- anova(betadisper(bray_dist, cut(pc1_scores, 2, labels = c("low", "high"))))
     cat(glue("{NL}[{season_name}] composition ~ PC1: R2 = {round(pc1_permanova$R2[1], STAT_DP)}, ",
              "p = {sprintf(P_FMT, pc1_permanova[['Pr(>F)']][1])}"), NL)
 
+    # Envfit of the hydro-geographic variables on the unconstrained ordination. The Results name the strongest
+    # correlates, so the whole table is written rather than left to the console.
+    # 水文—地理变量在非约束排序上的 envfit；结果中提及最强相关量，故整表写出。
+    ordination <- capscale(bray_dist ~ 1)
+    fitted_env <- envfit(ordination, season_env[, ENV_VARS], permutations = N_PERM)
+
     # dbRDA on the individual hydro-geographic factors
+    # 以各单一水文—地理因子为约束的 dbRDA。
     dbrda <- capscale(
         as.formula(paste("season_data$rel ~", paste(DBRDA_VARS, collapse = " + "))),
         data = season_env, distance = "bray"
@@ -133,6 +151,7 @@ gradient_results <- map(SEASONS, \(season_name) {
              "p = {round(dbrda_test[['Pr(>F)']][1], STAT_DP)}"), NL)
 
     # Mantel and partial Mantel: environmental vs geographic distance
+    # Mantel 与偏 Mantel：环境距离 vs 地理距离。
     env_dist           <- dist(scale(season_env[, ENV_VARS]))
     geo_dist           <- haversine_dist(season_env$lon, season_env$lat)
     mantel_env         <- mantel(bray_dist, env_dist, permutations = N_PERM)
@@ -144,6 +163,7 @@ gradient_results <- map(SEASONS, \(season_name) {
 
     # --- Plot-ready pieces for Figs 7 and 8 ---
     # Constrained axis percentages are taken over the constrained inertia, which is what a dbRDA axis label means.
+    # 约束轴百分比按约束惯量计算，此即 dbRDA 轴标签的含义。
     constrained_eig <- dbrda$CCA$eig
     axis_percent    <- 100 * constrained_eig / sum(constrained_eig)
 
@@ -151,11 +171,13 @@ gradient_results <- map(SEASONS, \(season_name) {
     arrows      <- scores(dbrda, display = "bp", choices = 1:2, scaling = 2)
 
     # Pairwise environmental distance against compositional dissimilarity, one row per site pair.
+    # 两两环境距离对组成相异性，每个站点对一行。
     pair_index <- which(lower.tri(as.matrix(bray_dist)), arr.ind = TRUE)
     site_ids   <- rownames(as.matrix(bray_dist))
 
     # Resolved before the tibble below, because a column named `season` would otherwise shadow the global season
     # vector inside the same tibble() call and silently return all 26 rows instead of this season's 13.
+    # 先在 tibble 之外求值：同名列 season 会遮蔽全局向量，导致 13 行静默变为 26 行。
     season_sections <- as.character(section[season == season_name])
 
     list(
@@ -192,17 +214,33 @@ gradient_results <- map(SEASONS, \(season_name) {
             p         = signif(mantel_env$signif, P_SIGFIG),
             partial_r = round(mantel_env_partial$statistic, STAT_DP),
             partial_p = signif(mantel_env_partial$signif, P_SIGFIG)
+        ),
+        pc1 = tibble(
+            season       = season_name,
+            R2           = round(pc1_permanova$R2[1], STAT_DP),
+            p            = signif(pc1_permanova[["Pr(>F)"]][1], P_SIGFIG),
+            betadisper_p = signif(pc1_dispersion[["Pr(>F)"]][1], P_SIGFIG)
+        ),
+        envfit = tibble(
+            season   = season_name,
+            variable = names(fitted_env$vectors$r),
+            r2       = round(fitted_env$vectors$r, STAT_DP),
+            p        = signif(fitted_env$vectors$pvals, P_SIGFIG)
         )
     )
 })
 
 # Variables keep their column names here; the figure scripts attach display labels, so nothing presentational leaks
 # into the analysis output.
+# 此处保留原始列名；显示标签由绘图脚本添加，避免呈现细节渗入分析输出。
 map(gradient_results, "scores") |> bind_rows() |> write.csv(DBRDA_SCORES_FILE, row.names = FALSE)
 map(gradient_results, "arrows") |> bind_rows() |> write.csv(DBRDA_ARROWS_FILE, row.names = FALSE)
 map(gradient_results, "stats")  |> bind_rows() |> write.csv(DBRDA_STATS_FILE,  row.names = FALSE)
 map(gradient_results, "pairs")  |> bind_rows() |> write.csv(ENV_PAIRS_FILE,    row.names = FALSE)
 map(gradient_results, "mantel") |> bind_rows() |> write.csv(MANTEL_STATS_FILE, row.names = FALSE)
+map(gradient_results, "pc1")    |> bind_rows() |> write.csv(PC1_PERMANOVA_FILE, row.names = FALSE)
+map(gradient_results, "envfit") |> bind_rows() |> arrange(season, -r2) |>
+    write.csv(ENVFIT_FILE, row.names = FALSE)
 
 
 # --- Alpha diversity vs PC1 (within season, BH-FDR across the 22 tests) -----------------------------------------------
@@ -241,10 +279,12 @@ if (file.exists(ALPHA_SITE_FILE)) {
 # environment and space each explain uniquely answers that directly, and answers it honestly: if the unique
 # environmental fraction is not significant, the two cannot be separated with these data and the paper should say so
 # rather than implying an environmental cause.
+# 上文的 envfit 与 dbRDA 无法区分组成是随环境还是随网络位置变化；方差分解可直接回答，且能诚实作答。
 community_distance <- vegdist(rel, "bray")
 
 # One frame holding all three predictor sets, so every model below is built from named columns of the same data. The
 # alternative, a formula with `~ .` plus Condition() on a matrix, does not survive model.matrix().
+# 三组预测变量合于一个数据框，使下方各模型均由同一数据的具名列构建。
 SEASON_TERMS <- "season"
 ENV_TERMS    <- ENV_VARS
 SPACE_TERMS  <- c("lon", "lat")
@@ -289,6 +329,7 @@ write.csv(variation, VARPART_FILE, row.names = FALSE)
 # --- Functional composition against the gradient ----------------------------------------------------------------------
 # The taxonomic side of this question is answered above. The functional side is the one the introduction raises and is
 # tested here on the same community-weighted trait means the Mantel test uses, so the two are commensurable.
+# 分类学一侧已在上文回答；功能一侧才是引言所提出的问题。
 if (!file.exists(CWM_FILE)) stop("Run 05_taxonomy_function.R first (needs cwm_by_site_season.csv).")
 cwm_matrix <- read.csv(CWM_FILE, row.names = 1, check.names = FALSE)
 cwm_matrix[] <- lapply(cwm_matrix, \(column) if (is.character(column)) as.factor(column) else column)
@@ -313,6 +354,7 @@ write.csv(functional_gradient, FUNC_GRADIENT_FILE, row.names = FALSE)
 # The partial Mantel above controls geography when testing environment. Running it the other way round is what shows
 # the asymmetry, and a plain geographic decay model shows how little distance alone accounts for. Reported together so
 # the claim "turnover tracks environment rather than distance" rests on both halves rather than on one.
+# 上文的偏 Mantel 在检验环境时控制地理；反向再做一次方能显示这一不对称。
 decay <- map(SEASONS, \(season_name) {
     season_data <- season_subset(season_name)
     season_env  <- season_data$env
@@ -320,9 +362,17 @@ decay <- map(SEASONS, \(season_name) {
     env_dist    <- dist(scale(season_env[, ENV_VARS]))
     geo_dist    <- haversine_dist(season_env$lon, season_env$lat)
     # Distance along the river network, as the difference in distance-from-source between two sites.
+    # 沿河网的距离，以两站点距源距离之差表示。
     network_dist <- dist(season_env$dist_source_km)
 
-    environment_given_geography <- mantel.partial(bray_dist, env_dist, geo_dist, permutations = N_PERM)
+    # environment | geography is already tested in the loop above; reusing it keeps the two tables in agreement,
+    # whereas testing it twice gave two different permutation p-values for one test.
+    # 环境|地理 已在上文检验；此处复用其结果，避免同一检验出现两个不同的置换 p 值。
+    loop_mantel <- map(gradient_results, "mantel") |> bind_rows()
+    environment_given_geography <- list(
+        statistic = loop_mantel$partial_r[loop_mantel$season == season_name],
+        signif    = loop_mantel$partial_p[loop_mantel$season == season_name]
+    )
     geography_given_environment <- mantel.partial(bray_dist, geo_dist, env_dist, permutations = N_PERM)
     network_only                <- mantel(bray_dist, network_dist, permutations = N_PERM)
     geography_only              <- mantel(bray_dist, geo_dist, permutations = N_PERM)
@@ -336,6 +386,7 @@ decay <- map(SEASONS, \(season_name) {
         p        = signif(c(network_only$signif, geography_only$signif,
                             environment_given_geography$signif, geography_given_environment$signif), P_SIGFIG),
         # Share of turnover variance a simple linear decay on that distance accounts for.
+        # 该距离的简单线性衰减所能解释的周转方差比例。
         decay_R2 = round(c(summary(lm(as.vector(bray_dist) ~ as.vector(network_dist)))$r.squared,
                            summary(lm(as.vector(bray_dist) ~ as.vector(geo_dist)))$r.squared,
                            NA_real_, NA_real_), STAT_DP)
@@ -352,6 +403,7 @@ write.csv(decay, DECAY_FILE, row.names = FALSE)
 # Both the taxonomic and the functional dimension are tested, because the manuscript reports them separately: only the
 # functional one differs among sections in spring, and only it shows a dispersion difference in autumn. The functional
 # distance matrix comes from script 03, which is the one place it is built.
+# 分类学与功能两个层面分别检验，因稿件对二者分别报告。
 if (!file.exists(FUNCTIONAL_DIST_FILE)) stop("Run 03_beta_diversity.R first (needs functional_distance.csv).")
 functional_matrix <- as.matrix(read.csv(FUNCTIONAL_DIST_FILE, row.names = 1, check.names = FALSE))
 
@@ -360,9 +412,27 @@ functional_matrix <- as.matrix(read.csv(FUNCTIONAL_DIST_FILE, row.names = 1, che
 #' An overall section effect does not say which sections differ, and the manuscript names a specific contrast, so the
 #' pairwise tests are run and corrected across the three comparisons within each season and dimension.
 #'
-#' The full permutation count is used, not the quick one. These contrasts land close to the 0.05 threshold, and with
-#' 999 permutations the autumn downstream-tributary result flips between significant and not depending only on the
-#' random draw. A published claim must not depend on the seed, so the tests are run at N_PERM.
+#' Every distinct relabelling of a two-group comparison. / 两组比较的全部不同标签分配。
+#'
+#' A two-group PERMANOVA on n samples has only choose(n, n1) genuinely different group assignments, which for the
+#' eleven downstream and tributary sites is 462. Asking vegan for 9,999 permutations therefore does not sample the
+#' space more thoroughly, it samples a space of 462 outcomes 9,999 times at random, and the resulting p-value moves
+#' from run to run. These contrasts sit near 0.05, so that movement decided significance: the autumn
+#' downstream-tributary result crossed the threshold between runs. Enumerating all 462 gives the exact p-value.
+#'
+#' @param groups Factor of group membership, already ordered so that the first level comes first.
+#' @return An integer matrix whose rows are the permutations to test.
+exact_permutations <- function(groups) {
+    sample_count <- length(groups)
+    first_size   <- sum(groups == levels(groups)[1])
+    assignments  <- combn(sample_count, first_size, simplify = FALSE)
+    t(vapply(assignments,
+             \(chosen) as.integer(c(chosen, setdiff(seq_len(sample_count), chosen))),
+             integer(sample_count)))
+}
+
+#' Pairwise PERMANOVA between river sections, tested exactly and corrected within the set.
+#' 河段间两两 PERMANOVA，精确检验并在组内校正。
 #'
 #' @param distance_matrix Full distance matrix for the season's samples.
 #' @param groups Factor of river sections, aligned to the matrix rows.
@@ -371,13 +441,20 @@ pairwise_sections <- function(distance_matrix, groups) {
     combinations <- combn(levels(droplevels(groups)), 2, simplify = FALSE)
     tests <- map(combinations, \(pair) {
         keep <- groups %in% pair
-        result <- adonis2(as.dist(distance_matrix[keep, keep]) ~ droplevels(groups[keep]),
-                          permutations = N_PERM)
+        # Ordered by group so that exact_permutations() can build assignments by position.
+        # 按组排序，使 exact_permutations() 能按位置构建标签分配。
+        order_by_group <- order(factor(groups[keep], levels = pair))
+        pair_groups    <- droplevels(factor(groups[keep][order_by_group], levels = pair))
+        pair_distance  <- as.dist(distance_matrix[keep, keep][order_by_group, order_by_group])
+
+        result <- adonis2(pair_distance ~ pair_groups,
+                          permutations = exact_permutations(pair_groups))
         tibble(
-            contrast = paste(pair, collapse = "-"),
-            n        = sum(keep),
-            R2       = round(result$R2[1], STAT_DP),
-            p        = result[["Pr(>F)"]][1]
+            contrast     = paste(pair, collapse = "-"),
+            n            = sum(keep),
+            permutations = nrow(exact_permutations(pair_groups)),
+            R2           = round(result$R2[1], STAT_DP),
+            p            = result[["Pr(>F)"]][1]
         )
     }) |>
         bind_rows() |>
@@ -391,12 +468,14 @@ pairwise_sections <- function(distance_matrix, groups) {
 }
 
 # One entry per season and dimension, each carrying both the overall summary row and its three pairwise contrasts.
+# 每个季节与层面一个条目，同时携带总体汇总行及其三个两两对比。
 section_results <- map(SEASONS, \(season_name) {
     season_rows   <- season == season_name
     season_data   <- season_subset(season_name)
     river_section <- factor(section[season_rows])
 
     # Taxonomic and functional, from the same section factor so the two rows are directly comparable.
+    # 分类学与功能取自同一河段因子，使两行可直接比较。
     dimensions <- list(
         Taxonomic  = as.matrix(vegdist(season_data$rel, "bray")),
         Functional = functional_matrix[season_rows, season_rows]

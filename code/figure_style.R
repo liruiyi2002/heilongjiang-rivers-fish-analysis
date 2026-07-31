@@ -25,6 +25,7 @@
 # --- Plotting packages ------------------------------------------------------------------------------------------------
 # ggplot2 draws every panel; patchwork composes the multi-panel figures; scales supplies the axis formatters; ggrepel
 # pushes point and arrow labels apart, which is what keeps the ordination panels legible at 7 pt.
+# ggplot2 绘制各面板，patchwork 组合多面板，scales 提供刻度格式，ggrepel 避免标签重叠。
 figure_packages <- c("ggplot2", "patchwork", "scales", "ggrepel")
 missing_figure_packages <- setdiff(figure_packages, rownames(installed.packages()))
 if (length(missing_figure_packages)) {
@@ -36,20 +37,24 @@ suppressMessages(invisible(lapply(figure_packages, library, character.only = TRU
 # --- Page geometry and resolution -------------------------------------------------------------------------------------
 # Elsevier's three permitted artwork widths. A figure must be drawn at one of these, never at an arbitrary size, or the
 # typesetter rescales it and the lettering no longer matches the declared point size.
+# Elsevier 允许的三种插图宽度；须按其中之一出图，否则排版时缩放会使字号失准。
 WIDTH_SINGLE_MM  <- 90      # single column
 WIDTH_ONEHALF_MM <- 140     # 1.5 columns
 WIDTH_FULL_MM    <- 190     # full page width
 
 # 500 dpi is the combination-artwork requirement. At 190 mm that is 3740 px, which is what verify_figure() checks.
+# 组合图要求 500 dpi；190 mm 处即 3740 px，verify_figure() 据此校验。
 JOURNAL_DPI <- 500L
 
 # 7 pt is Elsevier's minimum lettering size after any scaling. Because figures are drawn at final size, the base size
 # is the size on the page and nothing shrinks later.
+# 7 pt 为 Elsevier 缩放后的最小字号；因按最终尺寸出图，字号即为纸面字号。
 BASE_PT  <- 7
 TITLE_PT <- 8               # panel titles, the only text allowed above the base size
 SMALL_PT <- 6               # permitted only for sub/superscripts, per the same specification
 
 # TIFF for the Elsevier submission, PDF for a vector copy that survives any later rescaling.
+# TIFF 供 Elsevier 投稿，PDF 为矢量副本，便于后续缩放。
 TIFF_COMPRESSION <- "lzw"
 
 
@@ -57,6 +62,7 @@ TIFF_COMPRESSION <- "lzw"
 # Collected here because marker size is the easiest thing to get wrong: a size that looks right on screen at 1400 px
 # disappears on a 90 mm column. These are ggplot2 point sizes, which are diameters in millimetres, so POINT_SIZE = 2
 # is a 2 mm dot on the printed page and stays comfortably visible.
+# 字号与点径最易出错：屏幕上合适的尺寸在 90 mm 栏宽下会消失，故集中定义。
 POINT_SIZE       <- 2.0     # ordination markers and sparse scatters, where every point is a site
 POINT_SIZE_DENSE <- 1.3     # scatters of every site pair, where hundreds of points overlap
 JITTER_SIZE      <- 1.4     # points overlaid on a boxplot or bar, showing the raw observations
@@ -65,6 +71,7 @@ MARKER_ALPHA     <- 0.75    # transparency for the dense scatters only
 
 # How far along its own direction an ordination arrow's label is anchored, as a multiple of the arrow length. Above 1
 # the label sits beyond the arrow head, away from the crowded origin where collinear arrows converge.
+# 排序图箭头标签沿自身方向锚定的距离，取箭头长度的倍数；大于 1 即置于箭头之外。
 LABEL_RADIUS <- 1.28
 
 #' Repelled arrow labels on their own translucent background. / 带半透明衬底的可避让箭头标签。
@@ -82,6 +89,7 @@ arrow_labels <- function(data) {
         size = text_size(BASE_PT), colour = INK_PRIMARY, inherit.aes = FALSE,
         # linewidth 0 rather than label.size: ggplot2 4.x moved the label border onto linewidth, and leaving it at the
         # default draws a box around every label, which is a lot of ink for a plate that is only there to mask.
+        # 用 linewidth 0 而非 label.size：ggplot2 4.x 已将标签边框改由 linewidth 控制。
         fill = scales::alpha("white", 0.72), linewidth = 0, label.size = NA,
         label.padding = unit(0.5, "mm"),
         segment.size = 0.15, segment.colour = INK_SECONDARY, min.segment.length = 0.2,
@@ -93,20 +101,24 @@ arrow_labels <- function(data) {
 
 # --- Palettes ---------------------------------------------------------------------------------------------------------
 # Taken verbatim from the original figure scripts so the redrawn figures keep the published colour scheme.
+# 配色取自原绘图脚本，使重绘后的插图沿用已发表的配色方案。
 PAL_SEASON  <- c(Spring = "#3C8DAD", Autumn = "#E08E45")
 PAL_SECTION <- c(Upstream = "#66A182", Downstream = "#8E7CC3", Tributary = "#E0995E")
 
 # The beta-diversity ordination used a lighter pair than the boxplots, and the partition bars a third set.
+# beta 排序图使用较浅的一对颜色，分解柱状图另用一组。
 PAL_SEASON_LIGHT <- c(Spring = "#8DD3C7", Autumn = "#BEBADA")
 PAL_COMPONENT    <- c(Total = "#BDBDBD", Turnover = "#80B1D3", Nestedness = "#FDB462")
 
 # Diverging scale for the correlation heat maps: one cool hue, a neutral midpoint, one warm hue. Never a rainbow, and
 # never a hue at the midpoint, so that zero correlation reads as absence of colour.
+# 热图的双向色阶：一冷色、一中性、一暖色；不用彩虹色，中点不设色相。
 DIVERGING_LOW  <- "#9BB7D4"
 DIVERGING_MID  <- "#F7F7F7"
 DIVERGING_HIGH <- "#E6B87D"
 
 # Recessive ink for grid lines, axes and annotation, so the data marks stay dominant.
+# 网格线、坐标轴与标注使用弱化的墨色，使数据标记保持主导。
 INK_PRIMARY   <- "#1A1A1A"
 INK_SECONDARY <- "#4D4D4D"
 INK_GRID      <- "#E6E6E6"
@@ -115,6 +127,7 @@ INK_GRID      <- "#E6E6E6"
 # --- Display labels ---------------------------------------------------------------------------------------------------
 # Column names are machine-friendly; these are what a reader sees on an axis or an ordination arrow. Kept here rather
 # than in the analysis scripts so that renaming something on a figure never touches a computation.
+# 列名便于机器读取，此处为读者在坐标轴或箭头上所见的名称。
 ENV_LABELS <- c(
     elev_m         = "Elevation",
     strahler       = "Strahler",
@@ -129,6 +142,7 @@ ENV_LABELS <- c(
 )
 
 # Water-quality and land-cover variables, for the supplementary correlation heat maps.
+# 水质与土地覆被变量，用于补充材料的相关热图。
 LOCAL_LABELS <- c(
     temperature_C          = "WT",
     pH                     = "pH",
@@ -163,6 +177,7 @@ significance_layers <- function(data, significant, label_size = BASE_PT) {
     marked <- data[significant, , drop = FALSE]
     list(
         # Outline drawn only on significant cells, on top of the fill so it is not overpainted.
+        # 轮廓仅绘于显著单元格，且位于填充之上以免被覆盖。
         geom_tile(data = marked, fill = NA, colour = INK_PRIMARY, linewidth = 0.55),
         geom_text(data = marked, aes(label = label), size = text_size(label_size),
                   colour = INK_PRIMARY, fontface = "bold"),
@@ -251,6 +266,7 @@ theme_journal <- function(base_points = BASE_PT, grid = "both") {
     theme_bw(base_size = base_points, base_family = "") +
         theme(
             # Text: nothing below base_points anywhere on the figure.
+            # 文字：图上任何位置均不低于 base_points。
             text            = element_text(colour = INK_PRIMARY, size = base_points),
             axis.text       = element_text(colour = INK_SECONDARY, size = base_points),
             axis.title      = element_text(colour = INK_PRIMARY, size = base_points),
@@ -261,6 +277,7 @@ theme_journal <- function(base_points = BASE_PT, grid = "both") {
             legend.title    = element_text(colour = INK_PRIMARY, size = base_points),
 
             # Recessive furniture: thin panel border, faint grid, no minor grid at all.
+            # 弱化的图面元素：细面板边框、浅网格，不绘次级网格。
             panel.border     = element_rect(colour = INK_SECONDARY, fill = NA, linewidth = 0.3),
             panel.grid.major.y = if (keep_y) element_line(colour = INK_GRID, linewidth = 0.2) else element_blank(),
             panel.grid.major.x = if (keep_x) element_line(colour = INK_GRID, linewidth = 0.2) else element_blank(),
@@ -268,6 +285,7 @@ theme_journal <- function(base_points = BASE_PT, grid = "both") {
             strip.background = element_blank(),
 
             # Ticks short and light; margins tight, because the width is fixed by the journal.
+            # 刻度线短而淡，边距紧凑，因宽度已由期刊固定。
             axis.ticks      = element_line(colour = INK_SECONDARY, linewidth = 0.2),
             axis.ticks.length = unit(1, "mm"),
             legend.key      = element_blank(),
@@ -276,11 +294,13 @@ theme_journal <- function(base_points = BASE_PT, grid = "both") {
             plot.margin     = margin(1, 1, 1, 1, "mm"),
 
             # Panel tags (A, B, C ...) as patchwork applies them: bold, at the title size.
+            # 面板标签（A、B、C……）按 patchwork 的方式呈现：加粗，取标题字号。
             plot.tag        = element_text(colour = INK_PRIMARY, size = TITLE_PT, face = "bold")
         )
 }
 
 # Applied once so that individual figure scripts do not have to repeat it.
+# 统一设置一次，各绘图脚本无需重复。
 theme_set(theme_journal())
 
 
@@ -309,6 +329,7 @@ save_figure <- function(plot, name, width_mm, height_mm) {
     }
 
     # Raster at the journal resolution. type = "cairo" gives antialiased text and honours the LZW request.
+    # 按期刊分辨率栅格化；type = "cairo" 提供抗锯齿文字并支持 LZW 压缩。
     grDevices::tiff(file.path(FIG_DIR, paste0(name, ".tif")),
                     width = width_mm, height = height_mm, units = "mm",
                     res = JOURNAL_DPI, compression = TIFF_COMPRESSION, type = "cairo")
@@ -321,9 +342,21 @@ save_figure <- function(plot, name, width_mm, height_mm) {
     print(plot)
     grDevices::dev.off()
 
-    # Vector copy at the same physical size, so all three files describe the same figure.
+    # Vector copies at the same physical size, so every file describes the same figure. PDF is the general-purpose
+    # vector format; EPS is the one Elsevier's own artwork guidance names alongside TIFF.
+    # 矢量副本采用相同物理尺寸，使各文件描述同一图形。
     grDevices::cairo_pdf(file.path(FIG_DIR, paste0(name, ".pdf")),
                          width = width_mm / 25.4, height = height_mm / 25.4)
+    print(plot)
+    grDevices::dev.off()
+
+    # cairo_ps rather than postscript(): EPS has no alpha channel, and the plain PostScript device drops
+    # transparency silently. Cairo rasterises just the transparent objects at fallback_resolution and leaves
+    # everything else as vector, so the ellipses and label plates survive without flattening the whole figure.
+    # 使用 cairo_ps 而非 postscript：EPS 无 alpha 通道，普通 PostScript 设备会静默丢弃透明度。
+    grDevices::cairo_ps(file.path(FIG_DIR, paste0(name, ".eps")),
+                        width = width_mm / 25.4, height = height_mm / 25.4,
+                        fallback_resolution = JOURNAL_DPI, onefile = FALSE)
     print(plot)
     grDevices::dev.off()
 
@@ -383,6 +416,7 @@ tiff_dimensions <- function(path) {
         field_type <- readBin(connection, "integer", 1, size = 2, signed = FALSE, endian = endian)
         readBin(connection, "integer", 1, size = 4, endian = endian)          # value count
         # A SHORT value sits in the first two bytes of the four-byte value field; a LONG fills it.
+        # SHORT 值置于四字节值域的前两字节，LONG 值则占满该域。
         value <- if (field_type == 3) {
             v <- readBin(connection, "integer", 1, size = 2, signed = FALSE, endian = endian)
             readBin(connection, "raw", 2)
