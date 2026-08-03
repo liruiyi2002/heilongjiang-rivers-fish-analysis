@@ -108,13 +108,21 @@ scenarios <- list(
 scenario_results <- map(scenarios, season_r2)
 full_r2 <- scenario_results[["Full community"]][["R2"]]
 
+# The reduction is computed from the unrounded R2 values and only then rounded. Rounding R2 first and differencing
+# against the unrounded full_r2 made the reference row report 0.26% where removing nothing must give exactly 0, and
+# inflated every other row by the same ~0.19 percentage points.
+# 下降幅度先由未取整的 R2 计算、后取整。若先取整 R2 再与未取整的 full_r2 相减，则「完整群落」一行会得到
+# 0.26%（未移除任何类群，理应恰为 0），其余各行亦同样虚高约 0.19 个百分点。
 leave_out <- tibble(
     scenario = names(scenarios),
     removed  = as.integer(lengths(scenarios)),
-    R2       = round(map_dbl(scenario_results, "R2"), STAT_DP),
+    R2_exact = map_dbl(scenario_results, "R2"),
     p        = signif(map_dbl(scenario_results, "p"), P_SIGFIG)
 ) |>
-    mutate(reduction_pct = round(100 * (full_r2 - R2) / full_r2, PCT_DP))
+    mutate(reduction_pct = round(100 * (full_r2 - R2_exact) / full_r2, PCT_DP),
+           R2            = round(R2_exact, STAT_DP)) |>
+    select(scenario, removed, R2, p, reduction_pct)
+stopifnot(leave_out$reduction_pct[leave_out$removed == 0L] == 0)
 cat(NL, "== Leave-one-out PERMANOVA ==", NL, sep = "")
 print(as.data.frame(leave_out), row.names = FALSE)
 write.csv(leave_out, LEAVEOUT_FILE, row.names = FALSE)
