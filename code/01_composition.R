@@ -26,6 +26,9 @@ SHARES_FILE     <- file.path(OUT_DIR, "Fig2_composition_shares.csv")
 # The asymptotic-completeness figures are quoted in the Results, so they are written out rather than only printed.
 # 渐近完整度数值在结果中被引用，故写出文件而非仅打印。
 COMPLETENESS_FILE <- file.path(OUT_DIR, "TableS13_asymptotic_completeness.csv")
+# The per-order and per-family taxa counts and read shares quoted in the first Results paragraph.
+# 结果首段所引各目、各科的类群数与读数占比。
+RANK_SHARES_FILE  <- file.path(OUT_DIR, "TableS17_rank_read_shares.csv")
 TOP_N           <- 10
 
 cat(NL, "== Community composition / 群落组成 ==", NL, sep = "")
@@ -38,6 +41,37 @@ ranks <- taxonomy[colnames(reads), ]
 cat(glue("Orders: {n_distinct(ranks$order)} | ",
          "Families: {n_distinct(ranks$family)} | ",
          "Genera: {n_distinct(ranks$genus)}"), NL)
+
+
+# --- Taxa and read share by order and by family -----------------------------------------------------------------------
+# The first Results paragraph names the leading orders and families with a taxon count and a read share each. Those ten
+# numbers had no generator and appeared in no output file, so a reader could not check them and a rerun could not
+# re-verify them. They are computed here and written out.
+# 结果首段列出各主要目与科的类群数与读数占比；此十个数值原先无生成器、亦不见于任何输出文件，读者无从核对、
+# 重跑亦无从复验，故在此计算并写出。
+
+#' Taxa count and read share for each level of one taxonomic rank. / 某分类阶元各类别的类群数与读数占比。
+#'
+#' @param rank_name Column of the taxonomy table, "order" or "family".
+#' @return A tibble ordered by descending read share, with taxa, reads and percent columns.
+rank_summary <- function(rank_name) {
+    level <- ranks[[rank_name]]
+    tibble(
+        rank    = rank_name,
+        group   = level,
+        reads   = colSums(reads)
+    ) |>
+        summarise(taxa = n(), reads = sum(reads), .by = c(rank, group)) |>
+        mutate(percent = round(100 * reads / sum(reads), PCT_DP)) |>
+        arrange(desc(reads))
+}
+
+rank_shares <- bind_rows(rank_summary("order"), rank_summary("family"))
+stopifnot(nrow(rank_shares) == n_distinct(ranks$order) + n_distinct(ranks$family))
+write.csv(rank_shares, RANK_SHARES_FILE, row.names = FALSE)
+cat(NL, "== Leading orders and families by read share ==", NL, sep = "")
+print(as.data.frame(head(rank_shares[rank_shares$rank == "order", ], 3)), row.names = FALSE)
+print(as.data.frame(head(rank_shares[rank_shares$rank == "family", ], 3)), row.names = FALSE)
 
 
 # --- Seasonal shared and unique taxa ----------------------------------------------------------------------------------
