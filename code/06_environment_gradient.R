@@ -44,6 +44,10 @@ DECAY_FILE       <- file.path(OUT_DIR, "TableS12_distance_decay.csv")
 # only printed. / 组成对 PC1 与 envfit 相关量在结果中被引用，故一并写出文件。
 PC1_PERMANOVA_FILE <- file.path(OUT_DIR, "TableS14_composition_PC1.csv")
 ENVFIT_FILE        <- file.path(OUT_DIR, "TableS15_envfit.csv")
+# The Results also state that no index tracked a single representative variable and that main-stem and tributary sites
+# did not differ. Both are computed and written here, so neither claim rests on an analysis with no generator.
+# 结果中另称「无指数随单一代表性变量变化」「干流与支流无差异」，两者在此计算并写出，不留无生成器的论断。
+ALPHA_LOCAL_FILE   <- file.path(OUT_DIR, "TableS16_alpha_local_gradient.csv")
 
 # Written by earlier scripts; needed here.
 # 由前序脚本写出、本脚本需要读取的文件。
@@ -145,7 +149,12 @@ gradient_results <- map(SEASONS, \(season_name) {
         as.formula(paste("season_data$rel ~", paste(DBRDA_VARS, collapse = " + "))),
         data = season_env, distance = "bray"
     )
-    dbrda_test <- anova(dbrda, permutations = N_PERM_QUICK)
+    # N_PERM, not N_PERM_QUICK. At 999 permutations the Monte-Carlo standard error on this p-value is about 0.006,
+    # which is larger than its distance from 0.05: a sweep over seeds spanned 0.027 to 0.055, so the significance
+    # call moved with the seed. Every neighbouring test here already uses N_PERM.
+    # 此处须用 N_PERM。999 次置换下该 p 值的蒙特卡洛标准误约 0.006，大于其与 0.05 之距：不同随机种子下
+    # 结果在 0.027 至 0.055 间摆动，显著性判断随种子而变。相邻各检验本已使用 N_PERM。
+    dbrda_test <- anova(dbrda, permutations = N_PERM)
     cat(glue("[{season_name}] dbRDA (hydro-geographic factors): ",
              "adj R2 = {round(RsquareAdj(dbrda)$adj.r.squared, STAT_DP)}, ",
              "p = {round(dbrda_test[['Pr(>F)']][1], STAT_DP)}"), NL)
@@ -270,6 +279,45 @@ if (file.exists(ALPHA_SITE_FILE)) {
     alpha_vs_pc1 |>
         mutate(rho = round(rho, STAT_DP), p = signif(p, P_SIGFIG), FDR = signif(FDR, P_SIGFIG)) |>
         write.csv(ALPHA_PC1_FILE, row.names = FALSE)
+
+    # --- Alpha diversity against a single representative variable, and against channel type ---------------------------
+    # The Results state that no index tracked "a representative single variable" and that main-stem and tributary sites
+    # did not differ. Both claims were being made with no code behind them, so they are computed here rather than
+    # asserted. Distance from source is the representative variable: it is the strongest envfit correlate in spring and
+    # is not a log transform of another predictor.
+    # 结果中「单一代表性变量」与「干流—支流无差异」两项此前无代码支撑，故在此实算而非空言。以离源距离
+    # 为代表性变量：其在春季 envfit 中相关最强，且非其他变量的对数变换。
+    env_row <- match(alpha$site, rownames(env))
+    alpha$dist_source_km <- env$dist_source_km[env_row]
+    alpha$channel_type   <- env$channel_type[env_row]
+    stopifnot(!anyNA(alpha$dist_source_km), !anyNA(alpha$channel_type),
+              length(unique(alpha$channel_type)) == 2L)
+
+    alpha_local <- map(SEASONS, \(season_name) {
+        season_alpha <- alpha[alpha$season == season_name, ]
+        tibble(
+            season      = season_name,
+            index       = alpha_indices,
+            rho_dist    = map_dbl(alpha_indices, \(index_name)
+                cor(season_alpha[[index_name]], season_alpha$dist_source_km, method = "spearman")),
+            p_dist      = map_dbl(alpha_indices, \(index_name)
+                cor.test(season_alpha[[index_name]], season_alpha$dist_source_km,
+                         method = "spearman", exact = FALSE)$p.value),
+            p_channel   = map_dbl(alpha_indices, \(index_name)
+                wilcox.test(season_alpha[[index_name]] ~ season_alpha$channel_type)$p.value)
+        )
+    }) |>
+        bind_rows() |>
+        mutate(FDR_dist = p.adjust(p_dist, "BH"), FDR_channel = p.adjust(p_channel, "BH"))
+
+    cat(glue("{NL}== alpha ~ distance from source: {sum(alpha_local$FDR_dist < FDR_ALPHA)} of ",
+             "{nrow(alpha_local)} significant after FDR; main-stem vs tributary: ",
+             "{sum(alpha_local$FDR_channel < FDR_ALPHA)} of {nrow(alpha_local)} =="), NL)
+
+    alpha_local |>
+        mutate(across(c(rho_dist), \(x) round(x, STAT_DP)),
+               across(c(p_dist, p_channel, FDR_dist, FDR_channel), \(x) signif(x, P_SIGFIG))) |>
+        write.csv(ALPHA_LOCAL_FILE, row.names = FALSE)
 }
 
 
