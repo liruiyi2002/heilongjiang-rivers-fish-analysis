@@ -46,8 +46,8 @@ Rscript code/03_beta_diversity.R
 | `03_beta_diversity.R`       | PERMANOVA, betadisper, PCoA and turnover/nestedness, taxonomic and functional. | Fig. 4            |
 | `04_simper_leaveout.R`      | SIMPER; leave-one-out PERMANOVA; IndVal.g; migratory read share.           | Fig. S1, Tables S2-S4 |
 | `05_taxonomy_function.R`    | Taxonomy-function coupling: Spearman (alpha), Mantel (beta).               | Fig. 5, Tables S5-S6  |
-| `06_environment_gradient.R` | PCA; alpha vs PC1; composition vs PC1; dbRDA; Mantel/partial Mantel.       | Figs 6-8, Table S7    |
-| `07_water_quality_supp.R`   | Water quality and land cover vs alpha diversity; four dbRDA models.        | Fig. S2, Tables S8-S9 |
+| `06_environment_gradient.R` | PCA; alpha vs PC1; composition vs PC1; dbRDA; Mantel/partial Mantel.       | Figs 6-8, Table 1, Tables S7-S8, S11-S13, S15-S17 |
+| `07_water_quality_supp.R`   | Water quality and land cover vs alpha diversity; four dbRDA models.        | Fig. S2, Tables S9-S10 |
 | `08_figures_main.R`         | Draws Figures 2-8 from `outputs/`, at journal specification.                | Figs 2-8              |
 | `09_figures_supp.R`         | Draws Figures S1-S2 from `outputs/`, at journal specification.             | Figs S1-S2            |
 | `figure_style.R`            | Artwork specification: column widths, 7 pt minimum, 500 dpi, palettes, save-and-verify. | (sourced by 08-09) |
@@ -77,7 +77,7 @@ locally, e.g. `N_PCOA_AXES` (02), `N_TOP_SIMPER` / `AUTUMN_GROUP` / `CHUM_SALMON
   each one is and where it came from.
 - **Outputs:** written to `../outputs/` (created automatically): `alpha_diversity_site_level.csv`,
   `Table_top_abundant_taxa.csv`, `Fig2_seasonal_occurrence.csv`, `beta_partition_taxonomic.csv`,
-  `alpha_vs_PC1.csv`, and `TableS1`–`TableS8`.
+  `alpha_vs_PC1.csv`, `Table1_site_characteristics.csv`, and `TableS1`–`TableS18`.
 
 ## Conventions
 

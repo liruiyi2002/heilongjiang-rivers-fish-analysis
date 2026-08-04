@@ -43,8 +43,8 @@ Rscript code/03_beta_diversity.R
 | `03_beta_diversity.R`       | 分类与功能两层面的 PERMANOVA、betadisper、PCoA 与周转/嵌套分解。 | 图 4         |
 | `04_simper_leaveout.R`      | SIMPER；留一 PERMANOVA；IndVal.g；洄游读数占比。         | 图 S1、表 S2-S4    |
 | `05_taxonomy_function.R`    | 分类-功能耦合：Spearman（alpha）、Mantel（beta）。       | 图 5、表 S5-S6     |
-| `06_environment_gradient.R` | PCA；alpha 对 PC1；组成对 PC1；dbRDA；Mantel/偏 Mantel。 | 图 6-8、表 S7      |
-| `07_water_quality_supp.R`   | 水质与土地覆被对 alpha 多样性；四个 dbRDA 模型。         | 图 S2、表 S8-S9    |
+| `06_environment_gradient.R` | PCA；alpha 对 PC1；组成对 PC1；dbRDA；Mantel/偏 Mantel。 | 图 6-8、表 1、表 S7-S8、S11-S13、S15-S17 |
+| `07_water_quality_supp.R`   | 水质与土地覆被对 alpha 多样性；四个 dbRDA 模型。         | 图 S2、表 S9-S10    |
 | `08_figures_main.R`         | 依据 `outputs/` 按期刊规范绘制图 2-8。                   | 图 2-8             |
 | `09_figures_supp.R`         | 依据 `outputs/` 按期刊规范绘制图 S1-S2。                 | 图 S1-S2           |
 | `figure_style.R`            | 插图规范：栏宽、最小 7 pt 字号、500 dpi、配色、保存与校验。 | （被 08-09 调用） |
@@ -70,7 +70,7 @@ Rscript code/03_beta_diversity.R
 
 - **输入：** [`../data/`](../data) 中的 CSV —— 各文件的内容与来源见 [`../data/README.zh-CN.md`](../data/README.zh-CN.md)。
 - **输出：** 写入 `../outputs/`（自动创建）：`alpha_diversity_site_level.csv`、`Table_top_abundant_taxa.csv`、
-  `Fig2_seasonal_occurrence.csv`、`beta_partition_taxonomic.csv`、`alpha_vs_PC1.csv`，以及 `TableS1`–`TableS8`。
+  `Fig2_seasonal_occurrence.csv`、`beta_partition_taxonomic.csv`、`alpha_vs_PC1.csv`、`Table1_site_characteristics.csv`，以及 `TableS1`–`TableS18`。
 
 ## 约定
 
