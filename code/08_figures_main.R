@@ -366,6 +366,22 @@ pca_label_set <- bind_rows(
                   label = display_label(variable), label_colour = INK_SECONDARY)
 )
 
+# ggrepel pushes labels away from each other and from the points in its own layer, but it knows nothing about the
+# arrow shafts drawn by geom_segment, so labels were landing across three or four of them. Sampling each shaft into
+# the same layer as empty labels makes those positions obstacles: an empty label draws nothing yet still repels, so
+# the real labels are pushed off the arrows without any change to the plotted values.
+# ggrepel 仅避让标签之间与本图层的点，并不知道 geom_segment 所绘的箭杆，故有三四个标签压在箭杆上。将各箭杆
+# 采样为同图层的空标签即可令其成为障碍：空标签不绘制任何内容，却仍具排斥力，从而把真实标签推离箭杆，
+# 且不改动任何绘图数值。
+SHAFT_SAMPLES <- 7L
+shaft_obstacles <- pca_loadings |>
+    reframe(label_x = PC1 * arrow_scale * seq(0.18, 1, length.out = SHAFT_SAMPLES),
+            label_y = PC2 * arrow_scale * seq(0.18, 1, length.out = SHAFT_SAMPLES),
+            .by = variable) |>
+    transmute(label_x, label_y, label = "", label_colour = INK_SECONDARY)
+stopifnot(nrow(shaft_obstacles) == nrow(pca_loadings) * SHAFT_SAMPLES)
+pca_label_set <- bind_rows(pca_label_set, shaft_obstacles)
+
 figure_6 <- ggplot(pca_scores, aes(PC1, PC2)) +
     geom_hline(yintercept = 0, colour = INK_GRID, linewidth = 0.25) +
     geom_vline(xintercept = 0, colour = INK_GRID, linewidth = 0.25) +
