@@ -108,21 +108,27 @@ scenarios <- list(
 scenario_results <- map(scenarios, season_r2)
 full_r2 <- scenario_results[["Full community"]][["R2"]]
 
-# The reduction is computed from the unrounded R2 values and only then rounded. Rounding R2 first and differencing
-# against the unrounded full_r2 made the reference row report 0.26% where removing nothing must give exactly 0, and
-# inflated every other row by the same ~0.19 percentage points.
-# 下降幅度先由未取整的 R2 计算、后取整。若先取整 R2 再与未取整的 full_r2 相减，则「完整群落」一行会得到
-# 0.26%（未移除任何类群，理应恰为 0），其余各行亦同样虚高约 0.19 个百分点。
+# Both columns are rounded first, and the reduction is then computed from the rounded R2 values. This is the only
+# arrangement that is both correct at the reference row and reproducible by a reader: the original code rounded R2
+# for display but differenced it against the unrounded full_r2, so "Full community" reported a 0.26% reduction where
+# removing nothing must give exactly 0, and every other row was inflated by the same ~0.19 points. Computing from
+# unrounded values throughout fixes the reference row but leaves the published table unreconcilable, because the
+# printed R2 column no longer yields the printed reduction.
+# 两列均先取整，再由取整后的 R2 计算下降幅度。这是唯一既在参照行正确、又能被读者复算的做法：原代码以取整后的
+# R2 显示、却与未取整的 full_r2 相减，使「完整群落」一行得到 0.26%（理应恰为 0），其余各行亦虚高约 0.19 个
+# 百分点；若全程使用未取整值，参照行虽正确，但已发表表格中的 R2 列无法推出所印的下降幅度。
 leave_out <- tibble(
     scenario = names(scenarios),
     removed  = as.integer(lengths(scenarios)),
-    R2_exact = map_dbl(scenario_results, "R2"),
+    R2       = round(map_dbl(scenario_results, "R2"), STAT_DP),
     p        = signif(map_dbl(scenario_results, "p"), P_SIGFIG)
 ) |>
-    mutate(reduction_pct = round(100 * (full_r2 - R2_exact) / full_r2, PCT_DP),
-           R2            = round(R2_exact, STAT_DP)) |>
-    select(scenario, removed, R2, p, reduction_pct)
-stopifnot(leave_out$reduction_pct[leave_out$removed == 0L] == 0)
+    mutate(reduction_pct = round(100 * (round(full_r2, STAT_DP) - R2) / round(full_r2, STAT_DP), PCT_DP))
+stopifnot(leave_out$reduction_pct[leave_out$removed == 0L] == 0,
+          # Every printed reduction must be recomputable from the printed R2 column, to the printed precision.
+          # 每一个所印下降幅度均须可由所印 R2 列按所印精度复算得出。
+          all(abs(leave_out$reduction_pct -
+                  round(100 * (leave_out$R2[1] - leave_out$R2) / leave_out$R2[1], PCT_DP)) < 1e-9))
 cat(NL, "== Leave-one-out PERMANOVA ==", NL, sep = "")
 print(as.data.frame(leave_out), row.names = FALSE)
 write.csv(leave_out, LEAVEOUT_FILE, row.names = FALSE)
