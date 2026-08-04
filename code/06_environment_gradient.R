@@ -26,8 +26,10 @@ set.seed(RANDOM_SEED)
 # this script reports rather than from a second, independent computation.
 # 本脚本的输出文件；图 6-8 的文件含排序坐标、箭头坐标与样本对清单。
 ALPHA_PC1_FILE <- file.path(OUT_DIR, "alpha_vs_PC1.csv")
+# The manuscript's only main-text table. / 稿件唯一的正文表格。
+SITE_TABLE_FILE <- file.path(OUT_DIR, "Table1_site_characteristics.csv")
 SECTIONS_FILE  <- file.path(OUT_DIR, "TableS7_spatial_sections.csv")
-CONTRASTS_FILE <- file.path(OUT_DIR, "TableS7b_section_contrasts.csv")
+CONTRASTS_FILE <- file.path(OUT_DIR, "TableS8_section_contrasts.csv")
 PCA_SCORES_FILE    <- file.path(OUT_DIR, "Fig6_pca_scores.csv")
 PCA_LOADINGS_FILE  <- file.path(OUT_DIR, "Fig6_pca_loadings.csv")
 PCA_VARIANCE_FILE  <- file.path(OUT_DIR, "Fig6_pca_variance.csv")
@@ -37,17 +39,17 @@ DBRDA_STATS_FILE   <- file.path(OUT_DIR, "Fig7_dbrda_stats.csv")
 ENV_PAIRS_FILE     <- file.path(OUT_DIR, "Fig8_env_pairs.csv")
 MANTEL_STATS_FILE  <- file.path(OUT_DIR, "Fig8_mantel_stats.csv")
 
-VARPART_FILE     <- file.path(OUT_DIR, "TableS10_variation_partitioning.csv")
-FUNC_GRADIENT_FILE <- file.path(OUT_DIR, "TableS11_functional_composition_PC1.csv")
-DECAY_FILE       <- file.path(OUT_DIR, "TableS12_distance_decay.csv")
+VARPART_FILE     <- file.path(OUT_DIR, "TableS11_variation_partitioning.csv")
+FUNC_GRADIENT_FILE <- file.path(OUT_DIR, "TableS12_functional_composition_PC1.csv")
+DECAY_FILE       <- file.path(OUT_DIR, "TableS13_distance_decay.csv")
 # Composition against PC1 and the envfit correlates are quoted in the Results, so both are written out rather than
 # only printed. / 组成对 PC1 与 envfit 相关量在结果中被引用，故一并写出文件。
-PC1_PERMANOVA_FILE <- file.path(OUT_DIR, "TableS14_composition_PC1.csv")
-ENVFIT_FILE        <- file.path(OUT_DIR, "TableS15_envfit.csv")
+PC1_PERMANOVA_FILE <- file.path(OUT_DIR, "TableS15_composition_PC1.csv")
+ENVFIT_FILE        <- file.path(OUT_DIR, "TableS16_envfit.csv")
 # The Results also state that no index tracked a single representative variable and that main-stem and tributary sites
 # did not differ. Both are computed and written here, so neither claim rests on an analysis with no generator.
 # 结果中另称「无指数随单一代表性变量变化」「干流与支流无差异」，两者在此计算并写出，不留无生成器的论断。
-ALPHA_LOCAL_FILE   <- file.path(OUT_DIR, "TableS16_alpha_local_gradient.csv")
+ALPHA_LOCAL_FILE   <- file.path(OUT_DIR, "TableS17_alpha_local_gradient.csv")
 
 # Written by earlier scripts; needed here.
 # 由前序脚本写出、本脚本需要读取的文件。
@@ -70,6 +72,34 @@ cat(glue("Variance explained (PC1-3): ",
          "{var_explained[1]}% {var_explained[2]}% {var_explained[3]}%"), NL)
 cat("PC1 loadings:", NL, sep = "")
 print(round(sort(pca$rotation[, 1]), STAT_DP))
+
+
+# --- Table 1: site characteristics (main text) -------------------------------------------------------------------------
+# The paper had eight figures and no table. For an applied journal the first thing a reader wants is the sites
+# themselves: where they are, how big the river is there, and where each sits on the gradient every later analysis
+# uses. Everything here is already in data/, so the table is a presentation of the deposited data rather than a new
+# result, and it is generated rather than typed so it cannot drift from the analysis.
+# 表 1：站点概况（正文）。原稿有八幅图而无表；对应用类期刊而言，读者首先需要的是站点本身——位置、河道规模，
+# 以及各站点在后续分析所用梯度上的位置。数据均已在 data/ 中，故此表为已交付数据的呈现而非新结果，且由代码
+# 生成，不会与分析脱节。
+site_table <- tibble(
+    site        = rownames(env),
+    site_name   = env$site_name,
+    section     = as.character(section[match(rownames(env), meta$site)]),
+    channel     = env$channel_type,
+    lat         = round(env$lat, 3),
+    lon         = round(env$lon, 3),
+    strahler    = as.integer(env$strahler),
+    drainage    = round(env$drainage_km2, 0),
+    discharge   = round(env$discharge_cms, 2),
+    dist_source = round(env$dist_source_km, 1),
+    PC1         = round(pca$x[, 1], STAT_DP)
+) |>
+    arrange(desc(PC1))
+stopifnot(nrow(site_table) == 13L, !anyNA(site_table))
+write.csv(site_table, SITE_TABLE_FILE, row.names = FALSE)
+cat(NL, "== Table 1: site characteristics ==", NL, sep = "")
+print(as.data.frame(site_table), row.names = FALSE)
 
 # Plot-ready PCA for Fig. 6: site scores with their river section, variable loadings, and the variance per axis.
 # 图 6 所需的 PCA 绘图数据：站点得分与河段、变量载荷、各轴方差。

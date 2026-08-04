@@ -25,10 +25,10 @@ OCCURRENCE_FILE <- file.path(OUT_DIR, "Fig2_seasonal_occurrence.csv")
 SHARES_FILE     <- file.path(OUT_DIR, "Fig2_composition_shares.csv")
 # The asymptotic-completeness figures are quoted in the Results, so they are written out rather than only printed.
 # 渐近完整度数值在结果中被引用，故写出文件而非仅打印。
-COMPLETENESS_FILE <- file.path(OUT_DIR, "TableS13_asymptotic_completeness.csv")
+COMPLETENESS_FILE <- file.path(OUT_DIR, "TableS14_asymptotic_completeness.csv")
 # The per-order and per-family taxa counts and read shares quoted in the first Results paragraph.
 # 结果首段所引各目、各科的类群数与读数占比。
-RANK_SHARES_FILE  <- file.path(OUT_DIR, "TableS17_rank_read_shares.csv")
+RANK_SHARES_FILE  <- file.path(OUT_DIR, "TableS18_rank_read_shares.csv")
 TOP_N           <- 10
 
 cat(NL, "== Community composition / 群落组成 ==", NL, sep = "")
@@ -216,4 +216,4 @@ write.csv(top_taxa_table, TOP_TAXA_FILE,   row.names = FALSE)
 write.csv(occurrence,     OCCURRENCE_FILE, row.names = FALSE)
 write.csv(shares,         SHARES_FILE,     row.names = FALSE)
 cat(NL, "wrote outputs/Table_top_abundant_taxa.csv, Fig2_seasonal_occurrence.csv, Fig2_composition_shares.csv, ",
-    "TableS13_asymptotic_completeness.csv", NL, sep = "")
+    "TableS14_asymptotic_completeness.csv", NL, sep = "")

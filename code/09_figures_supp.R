@@ -114,8 +114,8 @@ save_figure(figure_s1, "FigureS1", WIDTH_FULL_MM, 155)
 # it survives BH correction within its family, which is what makes the near-absence of real signal visible: the panels
 # are full of moderate correlations and almost no stars.
 # 每季节一个热图，涵盖两个变量族；单元格标注相关系数，仅族内校正后显著者加星。
-local_corr <- read_output("TableS8_local_alpha_spearman.csv", "07_water_quality_supp.R")
-local_dbrda <- read_output("TableS9_local_dbrda.csv",         "07_water_quality_supp.R")
+local_corr <- read_output("TableS9_local_alpha_spearman.csv", "07_water_quality_supp.R")
+local_dbrda <- read_output("TableS10_local_dbrda.csv",         "07_water_quality_supp.R")
 
 # Rows are ordered water quality first, then land cover, each in the order the data tables declare them, so the two
 # families read as blocks rather than being interleaved alphabetically.
@@ -156,9 +156,9 @@ correlation_panel <- function(season_name, show_legend) {
         )
 }
 
-# The dbRDA results belong with this figure, so they are stated in the caption strip rather than left only in Table S9.
+# The dbRDA results belong with this figure, so they are stated in the caption strip rather than left only in Table S10.
 # The note is wrapped, because set as one line it overflows the 190 mm width and the device silently clips the end.
-# dbRDA 结果与本图同属一事，故写入题注而不仅留于表 S9。
+# dbRDA 结果与本图同属一事，故写入题注而不仅留于表 S10。
 dbrda_note <- local_dbrda |>
     mutate(text = sprintf("%s %s adj. R² = %.3f, P = %s", season, tolower(family), adj_R2, format_p(p))) |>
     pull(text) |>

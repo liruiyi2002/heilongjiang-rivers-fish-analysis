@@ -23,8 +23,8 @@ set.seed(RANDOM_SEED)
 
 # Output files written by this script (ALPHA_SITE_FILE is defined in 00_setup.R).
 # 本脚本的输出文件（ALPHA_SITE_FILE 在 00_setup.R 中定义）。
-LOCAL_CORR_FILE  <- file.path(OUT_DIR, "TableS8_local_alpha_spearman.csv")
-LOCAL_DBRDA_FILE <- file.path(OUT_DIR, "TableS9_local_dbrda.csv")
+LOCAL_CORR_FILE  <- file.path(OUT_DIR, "TableS9_local_alpha_spearman.csv")
+LOCAL_DBRDA_FILE <- file.path(OUT_DIR, "TableS10_local_dbrda.csv")
 
 N_TOP_PRINT   <- 8                              # strongest correlations to print per variable family
 WATER_QUALITY <- "Water quality"                # variable-family labels used in both outputs
@@ -160,5 +160,5 @@ cat(glue("Significant models (p < {FDR_ALPHA}): {sum(dbrda_results$p < FDR_ALPHA
 write.csv(correlations, LOCAL_CORR_FILE, row.names = FALSE)
 write.csv(dbrda_results, LOCAL_DBRDA_FILE, row.names = FALSE)
 
-cat(NL, "wrote outputs/TableS8_local_alpha_spearman.csv", NL, sep = "")
-cat("wrote outputs/TableS9_local_dbrda.csv", NL, sep = "")
+cat(NL, "wrote outputs/TableS9_local_alpha_spearman.csv", NL, sep = "")
+cat("wrote outputs/TableS10_local_dbrda.csv", NL, sep = "")
