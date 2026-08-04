@@ -82,20 +82,27 @@ print(round(sort(pca$rotation[, 1]), STAT_DP))
 # 表 1：站点概况（正文）。原稿有八幅图而无表；对应用类期刊而言，读者首先需要的是站点本身——位置、河道规模，
 # 以及各站点在后续分析所用梯度上的位置。数据均已在 data/ 中，故此表为已交付数据的呈现而非新结果，且由代码
 # 生成，不会与分析脱节。
+# Each numeric column is formatted to a fixed number of decimals rather than rounded. round() followed by
+# write.csv drops trailing zeros, so a column came out ragged — "134.03" beside "133.925", "836" beside
+# "836.4" — and the builder copies the strings through verbatim into the published table.
+# 各数值列按固定小数位格式化，而非仅取整：round() 经 write.csv 会丢弃末位零，使同列精度参差
+# （如「134.03」与「133.925」并列），而构建脚本会原样带入已发表表格。
+fixed <- function(x, digits) formatC(x, format = "f", digits = digits)
+
 site_table <- tibble(
     site        = rownames(env),
     site_name   = env$site_name,
     section     = as.character(section[match(rownames(env), meta$site)]),
     channel     = env$channel_type,
-    lat         = round(env$lat, 3),
-    lon         = round(env$lon, 3),
+    lat         = fixed(env$lat, 3),
+    lon         = fixed(env$lon, 3),
     strahler    = as.integer(env$strahler),
-    drainage    = round(env$drainage_km2, 0),
-    discharge   = round(env$discharge_cms, 2),
-    dist_source = round(env$dist_source_km, 1),
-    PC1         = round(pca$x[, 1], STAT_DP)
+    drainage    = fixed(env$drainage_km2, 0),
+    discharge   = fixed(env$discharge_cms, 2),
+    dist_source = fixed(env$dist_source_km, 1),
+    PC1         = fixed(pca$x[, 1], STAT_DP)
 ) |>
-    arrange(desc(PC1))
+    arrange(desc(as.numeric(PC1)))
 stopifnot(nrow(site_table) == 13L, !anyNA(site_table))
 write.csv(site_table, SITE_TABLE_FILE, row.names = FALSE)
 cat(NL, "== Table 1: site characteristics ==", NL, sep = "")
