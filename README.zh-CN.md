@@ -2,8 +2,6 @@
 
 [English](README.md) · **中文**
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21622889.svg)](https://doi.org/10.5281/zenodo.21622889)
-
 本仓库提供乌苏里江（阿穆尔河 / 黑龙江的大型跨境支流）淡水鱼类 12S 环境 DNA（eDNA）宏条形码研究的可重现 R 代码与派生
 数据。脚本仅用 [`data/`](data) 中的数据即可重现稿件的全部结果——群落组成、alpha 与 beta 多样性、分类—功能耦合，
 以及纵向水文—地理梯度——无需联网或原始测序数据。
