@@ -1,14 +1,22 @@
-English (authoritative)  ·  中文（便利性翻译）: LICENSE.zh-CN
+English (authoritative)  ·  中文（便利性翻译）: LICENSES/LICENSE.zh-CN
 
 This repository is dual-licensed, and both licenses require attribution and permit
 non-commercial use only:
 
   * Source code -- everything in the `code/` folder -- is licensed under the
-    PolyForm Noncommercial License 1.0.0.  See LICENSE-CODE.
+    PolyForm Noncommercial License 1.0.0.  See LICENSES/LICENSE-CODE.
 
   * Data and documentation -- the CSV files in `data/`, the tables generated in
     `outputs/`, and the accompanying docs -- are licensed under the Creative Commons
-    Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0).  See LICENSE-DATA.
+    Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0).  See
+    LICENSES/LICENSE-DATA.
+
+  * Exception: `data/geo/` holds third-party basemap extracts that carry their own
+    licences and are NOT covered by the above.  The Natural Earth files are public
+    domain; the OpenStreetMap extracts are Open Database License (ODbL) 1.0 and must
+    be attributed to OpenStreetMap contributors.  ODbL data cannot be relicensed, so
+    it is redistributed here under ODbL.  See data/geo/SOURCES.md for the per-file
+    provenance and licence.
 
 Copyright (c) 2026 Ruiyi Li, Peilun Li, Jiacheng Liu, Shuhan Xiong and Jilong Wang.
 
