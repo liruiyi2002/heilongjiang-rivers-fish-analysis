@@ -286,7 +286,7 @@ figure_5a <- ggplot(coupling_cells, aes(fun, tax, fill = rho)) +
     # Significant cells are boxed and bolded as well as starred, so they are visible at a glance rather than needing
     # the reader to hunt for a small asterisk.
     # 显著单元格除加星外另加框并加粗，使其一望即见。
-    significance_layers(coupling_cells, coupling_cells$FDR < FDR_ALPHA, SMALL_PT) +
+    significance_layers(coupling_cells, coupling_cells$FDR < FDR_ALPHA, BASE_PT) +
     facet_wrap(~ scope, nrow = 1) +
     scale_fill_gradient2(low = DIVERGING_LOW, mid = DIVERGING_MID, high = DIVERGING_HIGH,
                          midpoint = 0, limits = c(-1, 1), name = expression(Spearman~rho),
@@ -304,7 +304,7 @@ figure_5a <- ggplot(coupling_cells, aes(fun, tax, fill = rho)) +
         legend.key.height = unit(2.2, "mm"),
         legend.key.width  = unit(12, "mm"),
         legend.margin     = margin(-2, 0, 0, 0),
-        plot.caption      = element_text(size = SMALL_PT, colour = INK_SECONDARY, hjust = 0)
+        plot.caption      = element_text(size = BASE_PT, colour = INK_SECONDARY, hjust = 0)
     )
 
 # TableS6 labels the pooled row "Combined"; matching on the wrong label silently returned no row, which is how the
@@ -528,3 +528,5 @@ figure_8 <- (mantel_panel(SPRING) | mantel_panel(AUTUMN)) &
 save_figure(figure_8, "Figure8", WIDTH_ONEHALF_MM, 72)
 
 cat(NL, "Main-text figures written to figures/", NL, sep = "")
+
+stop_if_artwork_failed()

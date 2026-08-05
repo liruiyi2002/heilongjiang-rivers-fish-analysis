@@ -174,10 +174,12 @@ figure_s2 <- (correlation_panel(SPRING, FALSE) | correlation_panel(AUTUMN, TRUE)
         tag_levels = "A",
         caption = figure_s2_caption,
         theme = theme(
-            plot.caption = element_text(size = SMALL_PT, colour = INK_SECONDARY, hjust = 0, lineheight = 1.15),
+            plot.caption = element_text(size = BASE_PT, colour = INK_SECONDARY, hjust = 0, lineheight = 1.15),
             plot.margin  = margin(1, 2, 1, 1, "mm")
         )
     )
 save_figure(figure_s2, "FigureS2", WIDTH_FULL_MM, 135)
 
 cat(NL, "Supplementary figures written to figures/", NL, sep = "")
+
+stop_if_artwork_failed()
