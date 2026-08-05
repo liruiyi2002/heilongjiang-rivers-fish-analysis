@@ -2,6 +2,8 @@
 
 **English** · [中文](README.zh-CN.md)
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21622889.svg)](https://doi.org/10.5281/zenodo.21622889)
+
 Reproducible R code and derived data for a 12S environmental-DNA (eDNA) metabarcoding study of the
 freshwater fish community of the **Ussuri River** (a large transboundary tributary of the Amur /
 Heilongjiang). The scripts reproduce every result in the manuscript — community composition, alpha and
