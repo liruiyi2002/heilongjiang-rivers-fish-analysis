@@ -21,17 +21,12 @@ authors:
     email: wangjilong@hrfri.ac.cn
     orcid: "https://orcid.org/0000-0001-9499-5800"
 repository-code: "https://github.com/liruiyi2002/heilongjiang-rivers-fish-analysis"
-# The concept DOI, which always resolves to the newest release. Using it here means this field never goes stale:
-# only `version` and `date-released` change from one release to the next. Zenodo also mints a DOI for each
-# individual version, and the one for v1.1.0 is recorded below for reference.
-# 此处使用 concept DOI（始终指向最新版本），故该字段不会过期：各次发布仅需更新 version 与 date-released。
-# Zenodo 亦为每个版本单独分配 DOI，v1.1.0 的版本 DOI 记录于下，仅供参考。
+# The concept DOI, which always resolves to the newest release. The repository cites the newest version by
+# design; the manuscript cites a specific version DOI instead, as Zenodo recommends for publications.
+# 此处使用 concept DOI（始终指向最新版本）：仓库按设计指向最新版；稿件则依 Zenodo 对出版物的建议，
+# 引用特定版本的 DOI。
 url: "https://doi.org/10.5281/zenodo.21622889"
 doi: "10.5281/zenodo.21622889"
-identifiers:
-  - type: doi
-    value: "10.5281/zenodo.21801525"
-    description: "Version DOI for release v1.1.0"
 license: CC-BY-NC-4.0
 version: "1.1.1"
 date-released: "2026-08-05"
