@@ -57,5 +57,5 @@
 ## 许可协议
 
 本仓库的数据与文档采用 **CC BY-NC 4.0**（署名、非商业使用）；分析代码另行采用 **PolyForm Noncommercial License
-1.0.0**。见 `../LICENSE`、`../LICENSE-DATA`（中文 `../LICENSE-DATA.zh-CN`）与 `../LICENSE-CODE`
-（中文 `../LICENSE-CODE.zh-CN`）。
+1.0.0**。见 `../LICENSE`、`../LICENSES/LICENSE-DATA`（中文 `../LICENSES/LICENSE-DATA.zh-CN`）与 `../LICENSES/LICENSE-CODE`
+（中文 `../LICENSES/LICENSE-CODE.zh-CN`）。

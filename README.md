@@ -25,8 +25,9 @@ tables in [`data/`](data), with no internet access or raw sequence reads require
 ├── README.md             # this file
 ├── CITATION.cff          # how to cite  (also CITATION.bib for BibTeX/LaTeX)
 ├── LICENSE               # dual-license summary
-├── LICENSE-CODE          # PolyForm Noncommercial 1.0.0  (applies to code/)
-└── LICENSE-DATA          # CC BY-NC 4.0                   (applies to data/ and docs)
+└── LICENSES/             # the licences themselves, and their Chinese versions
+    ├── LICENSE-CODE      # PolyForm Noncommercial 1.0.0  (applies to code/)
+    └── LICENSE-DATA      # CC BY-NC 4.0                   (applies to data/ and docs)
 ```
 
 ## Requirements
@@ -81,9 +82,9 @@ persistent DOI on Zenodo: [10.5281/zenodo.21622890](https://doi.org/10.5281/zeno
 
 This repository is **dual-licensed**, both requiring attribution and permitting non-commercial use only:
 
-- **Code** (`code/`) — [PolyForm Noncommercial License 1.0.0](LICENSE-CODE).
+- **Code** (`code/`) — [PolyForm Noncommercial License 1.0.0](LICENSES/LICENSE-CODE).
 - **Data and documentation** (`data/`, `outputs/`, and the docs) — [Creative Commons
-  Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)](LICENSE-DATA).
+  Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)](LICENSES/LICENSE-DATA).
 
 See [`LICENSE`](LICENSE) for the summary and [`CITATION.cff`](CITATION.cff) / [`CITATION.bib`](CITATION.bib)
 for how to attribute.

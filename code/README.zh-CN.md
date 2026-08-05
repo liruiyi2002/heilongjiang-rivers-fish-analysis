@@ -82,8 +82,8 @@ Rscript code/03_beta_diversity.R
 ## 许可协议
 
 双许可（均要求署名且仅限非商业使用）：**代码**采用 PolyForm Noncommercial License 1.0.0
-（[`../LICENSE-CODE`](../LICENSE-CODE)，中文 [`../LICENSE-CODE.zh-CN`](../LICENSE-CODE.zh-CN)）；
-**数据与文档**采用 CC BY-NC 4.0（[`../LICENSE-DATA`](../LICENSE-DATA)，中文
-[`../LICENSE-DATA.zh-CN`](../LICENSE-DATA.zh-CN)）；概览见 [`../LICENSE`](../LICENSE)。引用方式见
+（[`../LICENSES/LICENSE-CODE`](../LICENSES/LICENSE-CODE)，中文 [`../LICENSES/LICENSE-CODE.zh-CN`](../LICENSES/LICENSE-CODE.zh-CN)）；
+**数据与文档**采用 CC BY-NC 4.0（[`../LICENSES/LICENSE-DATA`](../LICENSES/LICENSE-DATA)，中文
+[`../LICENSES/LICENSE-DATA.zh-CN`](../LICENSES/LICENSE-DATA.zh-CN)）；概览见 [`../LICENSE`](../LICENSE)。引用方式见
 `../CITATION.cff`（或 `../CITATION.bib`）。仓库：<https://github.com/liruiyi2002/heilongjiang-rivers-fish-analysis>；
 存档版本 DOI：<https://doi.org/10.5281/zenodo.21622890>。

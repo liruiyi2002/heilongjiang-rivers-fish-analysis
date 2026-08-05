@@ -70,4 +70,4 @@ reads). The study name is retained here.
 
 The data and documentation in this repository are licensed under **CC BY-NC 4.0** (attribution,
 non-commercial); the analysis code is licensed separately under the **PolyForm Noncommercial License
-1.0.0**. See `../LICENSE`, `../LICENSE-DATA` and `../LICENSE-CODE`.
+1.0.0**. See `../LICENSE`, `../LICENSES/LICENSE-DATA` and `../LICENSES/LICENSE-CODE`.

@@ -20,9 +20,10 @@
 ├── README.md             # 英文说明
 ├── README.zh-CN.md       # 本文件（中文说明）
 ├── CITATION.cff          # 引用信息（BibTeX/LaTeX 见 CITATION.bib）
-├── LICENSE               # 双许可协议概览（中文见 LICENSE.zh-CN）
-├── LICENSE-CODE          # PolyForm Noncommercial 1.0.0（适用于 code/；中文见 LICENSE-CODE.zh-CN）
-└── LICENSE-DATA          # CC BY-NC 4.0（适用于 data/ 与文档；中文见 LICENSE-DATA.zh-CN）
+├── LICENSE               # 双许可协议概览（中文见 LICENSES/LICENSE.zh-CN）
+└── LICENSES/             # 协议正文及其中文版
+    ├── LICENSE-CODE      # PolyForm Noncommercial 1.0.0（适用于 code/）
+    └── LICENSE-DATA      # CC BY-NC 4.0（适用于 data/ 与文档）
 ```
 
 ## 环境要求
@@ -69,10 +70,10 @@ alpha 多样性表，绘图脚本 `08`–`09` 需要 `01`–`07` 的输出，如
 
 本仓库采用**双许可**，两者均要求署名且仅限非商业使用：
 
-- **代码**（`code/`）—— [PolyForm Noncommercial License 1.0.0](LICENSE-CODE)（中文说明见
-  [`LICENSE-CODE.zh-CN`](LICENSE-CODE.zh-CN)）。
+- **代码**（`code/`）—— [PolyForm Noncommercial License 1.0.0](LICENSES/LICENSE-CODE)（中文说明见
+  [`LICENSES/LICENSE-CODE.zh-CN`](LICENSES/LICENSE-CODE.zh-CN)）。
 - **数据与文档**（`data/`、`outputs/` 及文档）—— [知识共享 署名—非商业性使用 4.0 国际
-  （CC BY-NC 4.0）](LICENSE-DATA)（中文说明见 [`LICENSE-DATA.zh-CN`](LICENSE-DATA.zh-CN)）。
+  （CC BY-NC 4.0）](LICENSES/LICENSE-DATA)（中文说明见 [`LICENSES/LICENSE-DATA.zh-CN`](LICENSES/LICENSE-DATA.zh-CN)）。
 
-概览见 [`LICENSE`](LICENSE)（中文见 [`LICENSE.zh-CN`](LICENSE.zh-CN)）。以上中文许可说明均为便利性翻译，如有歧义
+概览见 [`LICENSE`](LICENSE)（中文见 [`LICENSES/LICENSE.zh-CN`](LICENSES/LICENSE.zh-CN)）。以上中文许可说明均为便利性翻译，如有歧义
 以英文版为准。
