@@ -26,10 +26,23 @@
 # ggplot2 draws every panel; patchwork composes the multi-panel figures; scales supplies the axis formatters; ggrepel
 # pushes point and arrow labels apart, which is what keeps the ordination panels legible at 7 pt.
 # ggplot2 绘制各面板，patchwork 组合多面板，scales 提供刻度格式，ggrepel 避免标签重叠。
+# USER_LIB normally comes from 00_setup.R, which every pipeline script sources first. It is defined here as well
+# so that this file also works when sourced on its own, and so the library exists before anything installs into
+# it: .libPaths() discards a path that does not exist, which silently redirected installation to the
+# unwritable system library.
+# USER_LIB 通常由 00_setup.R 定义（各流程脚本均先加载该文件）；此处一并定义，使本文件亦可独立加载，并确保
+# 安装前目录已存在——.libPaths() 会丢弃不存在的路径，从而把安装静默重定向到不可写的系统库。
+if (!exists("USER_LIB")) {
+    USER_LIB <- path.expand("~/R/library")
+    dir.create(USER_LIB, recursive = TRUE, showWarnings = FALSE)
+    .libPaths(c(USER_LIB, .libPaths()))
+}
+
 figure_packages <- c("ggplot2", "patchwork", "scales", "ggrepel")
 missing_figure_packages <- setdiff(figure_packages, rownames(installed.packages()))
 if (length(missing_figure_packages)) {
-    install.packages(missing_figure_packages, repos = "https://cloud.r-project.org")
+    install.packages(missing_figure_packages, lib = USER_LIB,
+                     repos = "https://cloud.r-project.org")
 }
 suppressMessages(invisible(lapply(figure_packages, library, character.only = TRUE)))
 
@@ -51,7 +64,13 @@ JOURNAL_DPI <- 500L
 # 7 pt 为 Elsevier 缩放后的最小字号；因按最终尺寸出图，字号即为纸面字号。
 BASE_PT  <- 7
 TITLE_PT <- 8               # panel titles, the only text allowed above the base size
-SMALL_PT <- 6               # permitted only for sub/superscripts, per the same specification
+# 6 pt is permitted by Elsevier for sub- and superscripts ONLY. Nothing in this package uses it: it was
+# applied to two figure captions and a set of significance markers, all of which breached the 7 pt floor
+# this file exists to enforce. Kept, unused, so the permitted exception is documented rather than
+# rediscovered.
+# Elsevier 仅允许上下标使用 6 pt。本包不再使用该值：此前曾用于两个图题与一组显著性标记，均低于本文件
+# 所要维护的 7 pt 下限。保留但不使用，以记录该例外情形。
+SMALL_PT <- 6
 
 # TIFF for the Elsevier submission, PDF for a vector copy that survives any later rescaling.
 # TIFF 供 Elsevier 投稿，PDF 为矢量副本，便于后续缩放。
@@ -360,7 +379,12 @@ save_figure <- function(plot, name, width_mm, height_mm) {
     print(plot)
     grDevices::dev.off()
 
-    verify_figure(name, width_mm, height_mm)
+    # The verdict is recorded, not discarded. It used to be dropped on the floor, so a breach printed
+    # "FAIL" into a 356-line log and the pipeline still exited 0.
+    # 校验结果予以记录而非丢弃：此前结果被舍弃，故违规仅在长日志中打印 FAIL，而流程仍以 0 退出。
+    passed <- verify_figure(name, width_mm, height_mm)
+    FIGURE_AUDIT[[name]] <<- isTRUE(passed)
+    invisible(passed)
     invisible(file.path(FIG_DIR, paste0(name, ".tif")))
 }
 
@@ -374,6 +398,24 @@ save_figure <- function(plot, name, width_mm, height_mm) {
 #' @param width_mm Requested width in millimetres.
 #' @param height_mm Requested height in millimetres.
 #' @return TRUE if the file meets the specification, FALSE otherwise (invisibly).
+# --- Artwork audit register -------------------------------------------------------------------------------------------
+# Every save_figure() records its verdict here and stop_if_artwork_failed() is called at the end of each figure
+# script, so an artwork breach fails the run exactly as a missing input file does.
+# 各 save_figure() 将校验结果登记于此，图件脚本末尾调用 stop_if_artwork_failed()，使违规如缺少输入文件一样中断运行。
+FIGURE_AUDIT <- list()
+
+#' Stop the run if any figure failed its audit. / 若有图件未通过校验则中断运行。
+#'
+#' @return Invisibly TRUE when every figure passed; otherwise stops with the failing names.
+stop_if_artwork_failed <- function() {
+    failed <- names(FIGURE_AUDIT)[!unlist(FIGURE_AUDIT)]
+    if (length(failed)) {
+        stop("artwork audit failed for: ", paste(failed, collapse = ", "), call. = FALSE)
+    }
+    cat(glue("  artwork audit: {length(FIGURE_AUDIT)} figures, all within specification"), NL)
+    invisible(TRUE)
+}
+
 verify_figure <- function(name, width_mm, height_mm) {
     tiff_path <- file.path(FIG_DIR, paste0(name, ".tif"))
     if (!file.exists(tiff_path)) {

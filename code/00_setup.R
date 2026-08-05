@@ -13,7 +13,15 @@
 
 
 # --- R packages: set the library path, install any that are missing, then attach --------------------------------------
-.libPaths(c("~/R/library", .libPaths()))
+# The user library is created before it is used and then named explicitly. `.libPaths()` silently DISCARDS a
+# path that does not exist, so on a machine with no personal R library the first entry became the system
+# library, which is not writable, and install.packages() failed with a non-zero exit. A reviewer on a fresh
+# machine could not run this package at all.
+# 先创建再显式指定用户库路径。`.libPaths()` 会静默丢弃不存在的路径，故在没有个人 R 库的机器上，首位路径会变成
+# 不可写的系统库，install.packages() 随即以非零状态失败——审稿人在全新环境中根本无法运行本流程。
+USER_LIB <- path.expand("~/R/library")
+dir.create(USER_LIB, recursive = TRUE, showWarnings = FALSE)
+.libPaths(c(USER_LIB, .libPaths()))
 
 # vegan (ecology: distances, PERMANOVA, ordination), FD (functional diversity),
 # iNEXT (sample coverage), indicspecies (IndVal.g), cluster (Gower distance),
@@ -24,7 +32,7 @@ required_packages <- c("vegan", "FD", "iNEXT", "indicspecies", "cluster", "ape",
                        "dplyr", "tidyr", "purrr", "stringr", "glue")
 missing_packages <- setdiff(required_packages, rownames(installed.packages()))
 if (length(missing_packages)) {
-    install.packages(missing_packages, repos = "https://cloud.r-project.org")
+    install.packages(missing_packages, lib = USER_LIB, repos = "https://cloud.r-project.org")
 }
 suppressMessages(invisible(lapply(required_packages, library, character.only = TRUE)))
 
