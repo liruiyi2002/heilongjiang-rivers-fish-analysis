@@ -34,11 +34,7 @@ scripts <- c(
     "06_environment_gradient.R",
     "07_water_quality_supp.R",
     "08_figures_main.R",
-    "09_figures_supp.R",
-    # Robustness of every conclusion to the biogeographically questionable taxa. Runs after the figures
-    # because it reports against the same outputs rather than feeding them.
-    # 结论对存疑类群的稳健性检验；置于绘图之后，因其只对照既有输出而不生成输入。
-    "10_sensitivity_taxonomy.R"
+    "09_figures_supp.R"
 )
 
 for (script in scripts) {

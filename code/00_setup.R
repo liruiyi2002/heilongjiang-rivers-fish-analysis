@@ -3,12 +3,12 @@
 #
 # Shared setup
 # ------------
-# Loads every data table, builds the derived matrices, and attaches packages. Sourced by each analysis script (01-07).
+# Loads every data table, builds the derived matrices, and attaches packages. Sourced by each analysis script (01-09).
 # No internet or raw reads required.
 #
 # 共享初始化
 # ----------
-# 载入全部数据表、构建派生矩阵并加载 R 包；被每个分析脚本 (01-07) 调用。无需联网，也无需原始测序数据。
+# 载入全部数据表、构建派生矩阵并加载 R 包；被每个分析脚本 (01-09) 调用。无需联网，也无需原始测序数据。
 # ======================================================================================================================
 
 

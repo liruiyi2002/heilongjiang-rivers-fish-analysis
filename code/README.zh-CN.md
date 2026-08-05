@@ -25,7 +25,7 @@
 Rscript code/run_all.R
 ```
 
-该命令依次运行 `01`–`07`。也可单独运行某一步（每个脚本都会自行 source `00_setup.R`）：
+该命令依次运行 `01`–`09`。也可单独运行某一步（每个脚本都会自行 source `00_setup.R`）：
 
 ```sh
 Rscript code/03_beta_diversity.R

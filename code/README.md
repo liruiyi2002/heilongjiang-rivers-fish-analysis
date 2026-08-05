@@ -27,7 +27,7 @@ From the `reproducibility/` folder (the parent of this one):
 Rscript code/run_all.R
 ```
 
-That sources `01`–`07` in order. To run a single step (each one sources `00_setup.R` itself):
+That sources `01`–`09` in order. To run a single step (each one sources `00_setup.R` itself):
 
 ```sh
 Rscript code/03_beta_diversity.R
