@@ -61,7 +61,8 @@ can be changed in one place:
 
 - `SEASONS`, `SPRING`, `AUTUMN` — season labels used throughout.
 - `RANDOM_SEED` — seed for the permutation tests (reproducibility).
-- `N_PERM` (9999) / `N_PERM_QUICK` (999) — permutation counts for the heavier vs lighter tests.
+- `N_PERM` (9999) — the permutation count for every test in the package. Pairwise section contrasts are
+  exactly enumerated instead, because their group sizes admit few enough assignments.
 - `FDR_ALPHA` (0.05) — significance threshold after Benjamini–Hochberg correction.
 - `STAT_DP`, `PCT_DP`, `VAR_DP`, `DIST_DP`, `P_SIGFIG`, `P_FMT` — rounding / display precision.
 - `NL`, `NAME_SEP` — newline and the `Season_Site[_replicate]` name separator.

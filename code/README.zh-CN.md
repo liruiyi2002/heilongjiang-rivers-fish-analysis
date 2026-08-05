@@ -57,7 +57,8 @@ Rscript code/03_beta_diversity.R
 
 - `SEASONS`、`SPRING`、`AUTUMN` —— 通用的季节标签。
 - `RANDOM_SEED` —— 置换检验的随机种子（保证可重现）。
-- `N_PERM`（9999）/ `N_PERM_QUICK`（999）—— 较重与较轻检验的置换次数。
+- `N_PERM`（9999）—— 全流程各检验统一的置换次数。河段两两对比改用完全枚举，因其分组规模所允许的
+  排列数足够少。
 - `FDR_ALPHA`（0.05）—— BH-FDR 校正后的显著性阈值。
 - `STAT_DP`、`PCT_DP`、`VAR_DP`、`DIST_DP`、`P_SIGFIG`、`P_FMT` —— 取整/显示精度。
 - `NL`、`NAME_SEP` —— 换行符与 `Season_Site[_replicate]` 名称分隔符。

@@ -76,8 +76,12 @@ AUTUMN  <- "Autumn"
 SEASONS <- c(SPRING, AUTUMN)
 
 RANDOM_SEED  <- 1         # seed for the permutation-based tests
+# One permutation count for every test in the package. A second, smaller count used to exist for the
+# slower models; it made those tests quietly weaker than the 9,999 the manuscript quotes, and produced a
+# boundary p-value in the local dbRDA whose significance moved with the seed.
+# 全流程统一使用同一置换次数。此前另设较小的次数用于较慢的模型，致该等检验实际弱于稿件所述的 9,999 次，
+# 并使局部 dbRDA 出现随随机种子摆动的临界 p 值。
 N_PERM       <- 9999      # permutations for PERMANOVA, Mantel and betadisper
-N_PERM_QUICK <- 999       # permutations for SIMPER, IndVal.g, dbRDA and leave-one-out
 
 FDR_ALPHA <- 0.05         # significance threshold after BH-FDR correction
 

@@ -30,7 +30,7 @@ CHUM_SALMON    <- "Oncorhynchus_keta"    # the autumn-dominant chum salmon
 
 
 # --- SIMPER: top contributors to spring-autumn dissimilarity ----------------------------------------------------------
-simper_res <- summary(simper(rel, season, permutations = N_PERM_QUICK))[[1]]
+simper_res <- summary(simper(rel, season, permutations = N_PERM))[[1]]
 simper_res <- simper_res[order(-simper_res$average), ]
 
 # vegan returns each taxon's average contribution in dissimilarity units, and those contributions sum to the mean
@@ -68,7 +68,7 @@ write.csv(top_contributors, SIMPER_FILE, row.names = FALSE)
 
 
 # --- IndVal.g autumn indicator taxa -----------------------------------------------------------------------------------
-indval <- multipatt(as.data.frame(reads), season, func = "IndVal.g", control = how(nperm = N_PERM_QUICK))
+indval <- multipatt(as.data.frame(reads), season, func = "IndVal.g", control = how(nperm = N_PERM))
 indval$sign$FDR   <- p.adjust(indval$sign$p.value, "BH")
 autumn_indicators <- rownames(indval$sign)[indval$sign$index == AUTUMN_GROUP & indval$sign$FDR < FDR_ALPHA]
 cat(glue("{NL}Autumn indicator taxa (IndVal.g, FDR < {FDR_ALPHA}): {length(autumn_indicators)}"), NL)
@@ -92,7 +92,7 @@ season_r2 <- function(drop_taxa = character()) {
     kept_reads   <- rel[, !colnames(rel) %in% drop_taxa, drop = FALSE]
     nonzero_rows <- rowSums(kept_reads) > 0
     renormalised <- sweep(kept_reads[nonzero_rows, ], 1, rowSums(kept_reads[nonzero_rows, ]), "/")
-    result       <- adonis2(vegdist(renormalised, "bray") ~ season[nonzero_rows], permutations = N_PERM_QUICK)
+    result       <- adonis2(vegdist(renormalised, "bray") ~ season[nonzero_rows], permutations = N_PERM)
     c(R2 = result$R2[1], p = result[["Pr(>F)"]][1])
 }
 

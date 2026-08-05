@@ -186,7 +186,7 @@ gradient_results <- map(SEASONS, \(season_name) {
         as.formula(paste("season_data$rel ~", paste(DBRDA_VARS, collapse = " + "))),
         data = season_env, distance = "bray"
     )
-    # N_PERM, not N_PERM_QUICK. At 999 permutations the Monte-Carlo standard error on this p-value is about 0.006,
+    # N_PERM, not N_PERM. At 999 permutations the Monte-Carlo standard error on this p-value is about 0.006,
     # which is larger than its distance from 0.05: a sweep over seeds spanned 0.027 to 0.055, so the significance
     # call moved with the seed. Every neighbouring test here already uses N_PERM.
     # 此处须用 N_PERM。999 次置换下该 p 值的蒙特卡洛标准误约 0.006，大于其与 0.05 之距：不同随机种子下
@@ -393,7 +393,7 @@ unique_fraction_p <- function(target_terms, condition_terms) {
         reformulate(c(target_terms, sprintf("Condition(%s)", condition_terms)), response = "community_distance"),
         data = predictors
     )
-    anova(model, permutations = N_PERM_QUICK)[["Pr(>F)"]][1]
+    anova(model, permutations = N_PERM)[["Pr(>F)"]][1]
 }
 
 variation <- tibble(

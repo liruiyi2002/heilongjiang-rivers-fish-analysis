@@ -134,7 +134,7 @@ season_dbrda <- function(season_name, family_name, variables) {
     predictors  <- season_locals(season_name, season_data$site_ids)
 
     model      <- capscale(season_data$rel ~ ., data = predictors[, variables, drop = FALSE], distance = "bray")
-    model_test <- anova(model, permutations = N_PERM_QUICK)
+    model_test <- anova(model, permutations = N_PERM)
 
     tibble(
         season      = season_name,
