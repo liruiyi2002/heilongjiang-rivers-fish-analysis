@@ -38,7 +38,7 @@ Rscript code/03_beta_diversity.R
 | 文件                        | 功能                                                     | 稿件对应           |
 | --------------------------- | -------------------------------------------------------- | ------------------ |
 | `00_setup.R`                | 载入数据、构建矩阵、加载/安装 R 包、定义常量。           | （被所有脚本调用） |
-| `01_composition.R`          | 读数、目/科/属计数、共有/特有类群、覆盖度、优势类群。    | 结果 3.1、图 2     |
+| `01_composition.R`          | 读数、目/科/属计数、共有/特有类群、覆盖度、优势类群。    | 结果 3.1、图 2、表 S14、S18 |
 | `02_alpha_diversity.R`      | 分类与功能 alpha；季节配对 Wilcoxon（BH-FDR）。          | 图 3、表 S1        |
 | `03_beta_diversity.R`       | 分类与功能两层面的 PERMANOVA、betadisper、PCoA 与周转/嵌套分解。 | 图 4         |
 | `04_simper_leaveout.R`      | SIMPER；留一 PERMANOVA；IndVal.g；洄游读数占比。         | 图 S1、表 S2-S4    |
@@ -48,7 +48,7 @@ Rscript code/03_beta_diversity.R
 | `08_figures_main.R`         | 依据 `outputs/` 按期刊规范绘制图 2-8。                   | 图 2-8             |
 | `09_figures_supp.R`         | 依据 `outputs/` 按期刊规范绘制图 S1-S2。                 | 图 S1-S2           |
 | `figure_style.R`            | 插图规范：栏宽、最小 7 pt 字号、500 dpi、配色、保存与校验。 | （被 08-09 调用） |
-| `run_all.R`                 | 依次运行 01-07。                                         | -                  |
+| `run_all.R`                 | 依次运行 01-09 并汇总。                                  | -                  |
 | `map_generator/`            | 图 1（研究区域 + 河网位置）。**Python**，见其 README。    | 图 1               |
 
 ## 配置
@@ -86,4 +86,4 @@ Rscript code/03_beta_diversity.R
 **数据与文档**采用 CC BY-NC 4.0（[`../LICENSES/LICENSE-DATA`](../LICENSES/LICENSE-DATA)，中文
 [`../LICENSES/LICENSE-DATA.zh-CN`](../LICENSES/LICENSE-DATA.zh-CN)）；概览见 [`../LICENSE`](../LICENSE)。引用方式见
 `../CITATION.cff`（或 `../CITATION.bib`）。仓库：<https://github.com/liruiyi2002/heilongjiang-rivers-fish-analysis>；
-存档版本 DOI：<https://doi.org/10.5281/zenodo.21622890>。
+存档 DOI（所有版本）：<https://doi.org/10.5281/zenodo.21622889>。

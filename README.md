@@ -54,7 +54,9 @@ supplementary tables land in `outputs/`, and every figure lands in `figures/` as
 matching PNG and a vector PDF. Each figure is drawn only from files in `outputs/`, so a figure cannot
 disagree with the statistic it reports — change an analysis and the figure follows on the next run.
 Artwork is written at the journal's own limits (90/140/190 mm column widths, 7 pt minimum lettering,
-500 dpi for combination artwork) and each file is measured after writing; any breach is reported.
+500 dpi for combination artwork). Lettering size is set by construction from a single constant rather
+than measured; each figure's TIFF is measured after writing, and the run stops if any figure is out of
+specification.
 
 To run one step at a time, execute any `code/NN_*.R` script directly (each sources `code/00_setup.R`).
 Scripts `05`–`07` need the alpha-diversity table written by `02`, and the figure scripts `08`–`09` need
@@ -76,7 +78,8 @@ NCBI Sequence Read Archive (see the manuscript's data-availability statement for
 
 Please cite the associated article together with this repository — see [`CITATION.cff`](CITATION.cff),
 or [`CITATION.bib`](CITATION.bib) for a BibTeX/LaTeX entry. The archived release (v1.0.0) has a
-persistent DOI on Zenodo: [10.5281/zenodo.21622890](https://doi.org/10.5281/zenodo.21622890).
+persistent DOI on Zenodo: [10.5281/zenodo.21622889](https://doi.org/10.5281/zenodo.21622889). That DOI covers all versions and
+resolves to the most recent; the results in the article were produced with **v1.1.0**.
 
 ## License
 

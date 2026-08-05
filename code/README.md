@@ -41,7 +41,7 @@ Rscript code/03_beta_diversity.R
 | File                        | What it does                                                               | Manuscript            |
 | --------------------------- | -------------------------------------------------------------------------- | --------------------- |
 | `00_setup.R`                | Load data, build matrices, attach/install packages, define constants.      | (sourced by all)      |
-| `01_composition.R`          | Reads, order/family/genus counts, shared/unique taxa, coverage, dominants. | Results 3.1, Fig. 2   |
+| `01_composition.R`          | Reads, order/family/genus counts, shared/unique taxa, coverage, dominants. | Results 3.1, Fig. 2, Tables S14, S18 |
 | `02_alpha_diversity.R`      | Taxonomic and functional alpha; seasonal paired Wilcoxon (BH-FDR).         | Fig. 3, Table S1      |
 | `03_beta_diversity.R`       | PERMANOVA, betadisper, PCoA and turnover/nestedness, taxonomic and functional. | Fig. 4            |
 | `04_simper_leaveout.R`      | SIMPER; leave-one-out PERMANOVA; IndVal.g; migratory read share.           | Fig. S1, Tables S2-S4 |
@@ -51,7 +51,7 @@ Rscript code/03_beta_diversity.R
 | `08_figures_main.R`         | Draws Figures 2-8 from `outputs/`, at journal specification.                | Figs 2-8              |
 | `09_figures_supp.R`         | Draws Figures S1-S2 from `outputs/`, at journal specification.             | Figs S1-S2            |
 | `figure_style.R`            | Artwork specification: column widths, 7 pt minimum, 500 dpi, palettes, save-and-verify. | (sourced by 08-09) |
-| `run_all.R`                 | Run 01-07 in order.                                                        | -                     |
+| `run_all.R`                 | Run 01-09 in order, then report.                                           | -                     |
 | `map_generator/`            | Figure 1 (study area + river-network position). **Python**; see its README. | Fig. 1                |
 
 ## Configuration
@@ -94,4 +94,4 @@ Dual-licensed (both attribution + non-commercial): **code** under the PolyForm N
 ([`../LICENSES/LICENSE-DATA`](../LICENSES/LICENSE-DATA)); summary in [`../LICENSE`](../LICENSE). To cite, see
 `../CITATION.cff` (or `../CITATION.bib` for BibTeX/LaTeX).
 Repository: <https://github.com/liruiyi2002/heilongjiang-rivers-fish-analysis>;
-archived release DOI: <https://doi.org/10.5281/zenodo.21622890>.
+archived release DOI (all versions): <https://doi.org/10.5281/zenodo.21622889>.

@@ -12,7 +12,7 @@ counts are integers.
 | -------------------------------- | -------------------------------------------------------------------------------- |
 | `site_by_species_reads.csv`      | 26 site-seasons x 100 taxa; eDNA reads; the exact sum of the 3 field replicates. |
 | `replicate_by_species_reads.csv` | 78 samples x 100 taxa; per-replicate reads (spring = BZ2023, autumn = BZ2024).   |
-| `species_taxonomy.csv`           | 100 taxa -> genus / family / order (12 / 27 / 72); from the provider lineage.    |
+| `species_taxonomy.csv`           | 100 taxa -> order / family / genus (12 / 27 / 72); from the provider lineage.    |
 | `species_traits.csv`             | 100 taxa x 9 functional traits; FishBase, regional refs, primary literature.     |
 | `trait_value_glossary.csv`       | Original-to-English mapping for the categorical trait levels.                    |
 | `gower_distance.csv`             | 100 x 100 Gower distance among taxa; computed from species_traits.csv.           |
@@ -36,7 +36,7 @@ autumn). No minimum-read threshold and no minimum-replicate criterion are applie
 The two sequencing-provider deliveries each hold 13 sites x 3 field replicates. Summed per site they
 give the site-level table (`site_by_species_reads.csv`), and they map to season unambiguously:
 **BZ2023 = spring** (sampled April 2023), **BZ2024 = autumn** (sampled October 2024). Chum salmon
-(*Oncorhynchus keta*), an autumn spawner, is ~14% of reads in the autumn delivery and ~0% in the
+(*Oncorhynchus keta*), an autumn spawner, is 17.1% of reads in the autumn delivery and 0.05% in the
 spring one. The summed replicates reproduce the site-level table exactly (max difference 0 across all
 2,600 taxon x site-season cells).
 

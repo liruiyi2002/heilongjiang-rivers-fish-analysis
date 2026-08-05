@@ -30,10 +30,10 @@ From this folder:
 
 ```sh
 python make_figure.py            # 150 dpi PNG proof + label audit
-python make_figure.py --print    # 500 dpi TIFF and 300 dpi PNG for submission
+python make_figure.py --print    # 500 dpi TIFF, PNG and PDF for submission
 ```
 
-Output goes to `../../outputs/`. The script exits non-zero if the audit is not clean, so it can be wired
+Output goes to `../../figures/`, alongside the figures the R scripts draw; `outputs/` holds numerical results only. The script exits non-zero if the audit is not clean, so it can be wired
 into a check.
 
 ## Inputs
@@ -55,7 +55,7 @@ in points — against a stated print width, so the output holds its specificatio
 - **190 mm** wide, the usual full-width (double-column) figure size.
 - **All text ≥ 7 pt**, the common minimum for printed lettering; body labels sit at 7.5–8.5 pt, which
   also clears the ~2 mm label-height guidance some publishers apply.
-- **500 dpi** TIFF for combination artwork, plus a 300 dpi PNG.
+- **500 dpi** TIFF for combination artwork, plus a PNG and a PDF at the same resolution.
 
 The width, minimum point size, and resolutions are named constants at the top of `make_figure.py`, so a
 different specification is a one-line change rather than a re-layout.

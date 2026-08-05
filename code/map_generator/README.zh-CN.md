@@ -29,10 +29,10 @@ PolyForm Noncommercial License 1.0.0 发布：**须署名，且仅限非商业�
 
 ```sh
 python make_figure.py            # 150 dpi PNG 审阅图 + 标注审计
-python make_figure.py --print    # 500 dpi TIFF 与 300 dpi PNG（投稿用）
+python make_figure.py --print    # 500 dpi TIFF、PNG 与 PDF（投稿用）
 ```
 
-结果写入 `../../outputs/`。若审计未通过，脚本以非零状态退出，便于纳入自动检查。
+结果写入 `../../figures/`（与 R 脚本所绘插图同处）；`outputs/` 仅存放数值结果。若审计未通过，脚本以非零状态退出，便于纳入自动检查。
 
 ## 输入数据
 
@@ -53,7 +53,7 @@ OpenStreetMap 图层适用 **ODbL**，因此图上的署名行必须保留。
 - 宽 **190 mm**，即通常的通栏（双栏）插图尺寸。
 - **所有文字 ≥ 7 pt**，为印刷字号的常见下限；正文标注为 7.5–8.5 pt，同时满足部分出版方关于标注
   高度约 2 mm 的建议。
-- 组合图输出 **500 dpi** TIFF，并另出 300 dpi PNG。
+- 组合图输出 **500 dpi** TIFF，并以同一分辨率另出 PNG 与 PDF。
 
 宽度、最小字号与分辨率均为 `make_figure.py` 顶部的具名常量，因此更换规范只需改动一行，无需重排。
 
