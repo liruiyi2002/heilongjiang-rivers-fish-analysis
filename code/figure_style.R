@@ -127,6 +127,16 @@ PAL_SECTION <- c(Upstream = "#66A182", Downstream = "#8E7CC3", Tributary = "#E09
 # The beta-diversity ordination used a lighter pair than the boxplots, and the partition bars a third set.
 # beta 排序图使用较浅的一对颜色，分解柱状图另用一组。
 PAL_SEASON_LIGHT <- c(Spring = "#8DD3C7", Autumn = "#BEBADA")
+
+# Shape carries the same grouping as colour, so the ordinations survive greyscale printing and colour-vision
+# deficiency. The two ordination palettes were chosen for their hue separation, not their lightness: the
+# season pair differs by 6 of 255 in greyscale luminance and the upstream/downstream pair by 13, so on a
+# monochrome printout, or to a deuteranopic reader, every group collapsed into one. Colour alone was the only
+# channel distinguishing them. Filled circle / triangle / square are distinguishable at 2 mm.
+# 形状与颜色承载同一分组，使排序图在灰度打印与色觉缺陷下仍可读。两组排序配色按色相而非明度选取：季节配对的
+# 灰度亮度差仅为 6/255，上游与下游配对为 13，故灰度输出或红绿色觉异常读者眼中各组彼此不可分辨。
+SHAPE_SEASON  <- c(Spring = 21L, Autumn = 24L)                                 # circle, triangle
+SHAPE_SECTION <- c(Upstream = 21L, Downstream = 24L, Tributary = 22L)          # circle, triangle, square
 PAL_COMPONENT    <- c(Total = "#BDBDBD", Turnover = "#80B1D3", Nestedness = "#FDB462")
 
 # Diverging scale for the correlation heat maps: one cool hue, a neutral midpoint, one warm hue. Never a rainbow, and

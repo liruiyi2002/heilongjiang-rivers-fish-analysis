@@ -166,10 +166,16 @@ alpha_row <- function(index_names, axis_label) {
 
     ggplot(long, aes(season, value, fill = season)) +
         geom_boxplot(outlier.shape = NA, width = 0.55, linewidth = 0.25, colour = INK_SECONDARY) +
-        # Jitter shows every site; a white stroke keeps overlapping points readable.
-        # 抖动点显示每个站点；白色描边使重叠点仍可辨识。
-        geom_jitter(width = 0.13, height = 0, size = JITTER_SIZE, shape = 21,
-                    colour = "white", stroke = POINT_STROKE, aes(fill = season)) +
+        # Jitter shows every site. The seed matters: save_figure() prints the plot once per device, so an
+        # unseeded jitter draws different positions into the TIFF, PNG, PDF and EPS - the journal and its
+        # typesetter would then hold different figures. White fill with a dark stroke, as in Figure 4, so a
+        # point stays legible on top of its own box; filling with the season colour made in-box points read
+        # as hollow rings and out-of-box points as solid dots.
+        # 抖动点显示每个站点。须固定随机种子：save_figure() 对每种格式各绘制一次，未固定时四种交付格式的点位
+        # 互不相同。点用白色填充、深色描边（同图 4），以免落在同色箱体上的点显示为空心环。
+        geom_point(position = position_jitter(width = 0.13, height = 0, seed = RANDOM_SEED),
+                   size = JITTER_SIZE, shape = 21, fill = "white", colour = INK_SECONDARY,
+                   stroke = POINT_STROKE) +
         scale_fill_manual(values = PAL_SEASON, guide = "none") +
         facet_wrap(~ index, nrow = 1, scales = "free_y") +
         labs(x = NULL, y = axis_label) +
@@ -209,11 +215,12 @@ pcoa_panel <- function(facet_name) {
 
     ggplot(points, aes(axis1, axis2, fill = season)) +
         stat_ellipse(aes(colour = season), linewidth = 0.25, show.legend = FALSE) +
-        geom_point(size = POINT_SIZE, shape = 21, colour = "white", stroke = POINT_STROKE) +
+        geom_point(aes(shape = season), size = POINT_SIZE, colour = "white", stroke = POINT_STROKE) +
         annotate("text", x = -Inf, y = Inf, label = annotation, hjust = -0.05, vjust = 1.25,
                  size = text_size(BASE_PT), colour = INK_SECONDARY, lineheight = 1.05) +
         scale_fill_manual(values = PAL_SEASON_LIGHT, name = NULL) +
         scale_colour_manual(values = PAL_SEASON_LIGHT, name = NULL) +
+        scale_shape_manual(values = SHAPE_SEASON, name = NULL) +
         labs(x = sprintf("PCoA1 (%.1f%%)", stats$axis1_percent),
              y = sprintf("PCoA2 (%.1f%%)", stats$axis2_percent)) +
         # Headroom at the top so the annotation block never collides with the ellipses.
@@ -243,9 +250,10 @@ partition_panel <- function(partition, axis_label) {
                       colour = INK_PRIMARY) +
         # Every site shown, so the reader sees the spread the mean is drawn from rather than only an error bar.
         # 显示全部站点，使读者看到均值背后的离散程度，而非仅见误差棒。
-        geom_jitter(data = long, aes(component, value), width = 0.12, height = 0,
-                    size = JITTER_SIZE, shape = 21, fill = "white", colour = INK_SECONDARY, stroke = POINT_STROKE,
-                    inherit.aes = FALSE) +
+        geom_point(data = long, aes(component, value),
+                   position = position_jitter(width = 0.12, height = 0, seed = RANDOM_SEED),
+                   size = JITTER_SIZE, shape = 21, fill = "white", colour = INK_SECONDARY,
+                   stroke = POINT_STROKE, inherit.aes = FALSE) +
         scale_fill_manual(values = PAL_COMPONENT, guide = "none") +
         scale_y_continuous(expand = expansion(mult = c(0, 0.08))) +
         labs(x = NULL, y = axis_label) +
@@ -389,7 +397,8 @@ figure_6 <- ggplot(pca_scores, aes(PC1, PC2)) +
                  aes(x = 0, y = 0, xend = PC1 * arrow_scale, yend = PC2 * arrow_scale),
                  arrow = arrow(length = unit(1.2, "mm")), linewidth = 0.25, colour = INK_SECONDARY,
                  inherit.aes = FALSE) +
-    geom_point(aes(fill = section), size = POINT_SIZE, shape = 21, colour = "white", stroke = POINT_STROKE) +
+    geom_point(aes(fill = section, shape = section), size = POINT_SIZE, colour = "white",
+               stroke = POINT_STROKE) +
     # Site codes and variable names are placed by a single repulsion pass over the combined set, so the two kinds of
     # label avoid each other as well as themselves. Two separate repel layers cannot do this: each is blind to the
     # other, and a variable label lands on top of a site code, hiding which site it was.
@@ -405,6 +414,7 @@ figure_6 <- ggplot(pca_scores, aes(PC1, PC2)) +
     annotate("text", x = Inf, y = -Inf, label = "larger / downstream →", hjust = 1.05, vjust = -0.6,
              size = text_size(BASE_PT), colour = INK_SECONDARY) +
     scale_fill_manual(values = PAL_SECTION, name = NULL, limits = names(PAL_SECTION)) +
+    scale_shape_manual(values = SHAPE_SECTION, name = NULL, limits = names(PAL_SECTION)) +
     labs(x = sprintf("PC1 (%.1f%%)", pca_variance$percent[1]),
          y = sprintf("PC2 (%.1f%%)", pca_variance$percent[2])) +
     # Room around the point cloud for the repelled labels, so none is pushed against the panel border or clipped.
@@ -467,7 +477,8 @@ dbrda_panel <- function(season_name) {
                      aes(x = 0, y = 0, xend = CAP1 * scale_factor, yend = CAP2 * scale_factor),
                      arrow = arrow(length = unit(1.1, "mm")), linewidth = 0.22, colour = INK_SECONDARY,
                      inherit.aes = FALSE) +
-        geom_point(aes(fill = section), size = POINT_SIZE, shape = 21, colour = "white", stroke = POINT_STROKE) +
+        geom_point(aes(fill = section, shape = section), size = POINT_SIZE, colour = "white",
+                   stroke = POINT_STROKE) +
         # Drawn last, so the label plates sit above both the arrows and the markers.
         # 最后绘制，使标签衬底位于箭头与散点之上。
         arrow_labels(label_anchors) +
@@ -475,6 +486,7 @@ dbrda_panel <- function(season_name) {
                  label = sprintf("adj. R² = %.3f, P = %s", stats$adj_R2, format_p(stats$p)),
                  hjust = -0.05, vjust = 1.6, size = text_size(BASE_PT), colour = INK_PRIMARY) +
         scale_fill_manual(values = PAL_SECTION, name = NULL, limits = names(PAL_SECTION)) +
+        scale_shape_manual(values = SHAPE_SECTION, name = NULL, limits = names(PAL_SECTION)) +
         scale_colour_manual(values = PAL_SECTION, limits = names(PAL_SECTION)) +
         # Wide margins on both axes: the labels are repelled outward, and they must land inside the panel.
         # 两轴均留出较宽边距：标签向外避让，且必须落在面板之内。
