@@ -71,7 +71,7 @@ Rscript code/03_beta_diversity.R
 
 - **输入：** [`../data/`](../data) 中的 CSV —— 各文件的内容与来源见 [`../data/README.zh-CN.md`](../data/README.zh-CN.md)。
 - **输出：** 写入 `../outputs/`（自动创建）：`alpha_diversity_site_level.csv`、`Table_top_abundant_taxa.csv`、
-  `Fig2_seasonal_occurrence.csv`、`beta_partition_taxonomic.csv`、`alpha_vs_PC1.csv`、`Table1_site_characteristics.csv`，以及 `TableS1`–`TableS19`。
+  `Fig2_seasonal_occurrence.csv`、`beta_partition_taxonomic.csv`、`Table1_site_characteristics.csv`，以及 `TableS1`–`TableS19`。
 
 ## 约定
 

@@ -78,7 +78,7 @@ locally, e.g. `N_PCOA_AXES` (02), `N_TOP_SIMPER` / `AUTUMN_GROUP` / `CHUM_SALMON
   each one is and where it came from.
 - **Outputs:** written to `../outputs/` (created automatically): `alpha_diversity_site_level.csv`,
   `Table_top_abundant_taxa.csv`, `Fig2_seasonal_occurrence.csv`, `beta_partition_taxonomic.csv`,
-  `alpha_vs_PC1.csv`, `Table1_site_characteristics.csv`, and `TableS1`–`TableS19`.
+  `Table1_site_characteristics.csv`, and `TableS1`–`TableS19`.
 
 ## Conventions
 
