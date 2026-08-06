@@ -64,7 +64,7 @@ alpha 多样性表，绘图脚本 `08`–`09` 需要 `01`–`07` 的输出，如
 ## 引用
 
 请同时引用相关文章与本仓库——见 [`CITATION.cff`](CITATION.cff)，或 [`CITATION.bib`](CITATION.bib)（BibTeX/LaTeX）。
-本仓库在 Zenodo 上有持久 DOI：[10.5281/zenodo.21622889](https://doi.org/10.5281/zenodo.21622889)。该 DOI 涵盖所有版本并始终指向最新版；文章所载结果由 **v1.1.0** 生成。
+本仓库在 Zenodo 上有持久 DOI：[10.5281/zenodo.21622889](https://doi.org/10.5281/zenodo.21622889)。该 DOI 涵盖所有版本并始终指向最新版；文章所载结果由 **v1.1.1** 生成。
 
 ## 许可协议
 
