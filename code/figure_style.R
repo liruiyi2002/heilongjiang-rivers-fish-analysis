@@ -151,6 +151,10 @@ DIVERGING_HIGH <- "#E6B87D"
 INK_PRIMARY   <- "#1A1A1A"
 INK_SECONDARY <- "#4D4D4D"
 INK_GRID      <- "#E6E6E6"
+# A neutral fill for bars that carry no group identity, so they cannot be read against a categorical
+# legend that happens to sit beside them.
+# 中性填充色，用于不承载分组含义的柱体，以免被误读为旁侧分类图例中的某一类。
+INK_NEUTRAL   <- "#9E9E9E"
 
 
 # --- Display labels ---------------------------------------------------------------------------------------------------

@@ -675,9 +675,9 @@ def render_figure(dpi: int, supersample: int) -> RenderResult:
     label_set.reserve(labels.Rectangle(0.0, 0.0, map_width, map_height), "map-panel")
 
     draw.line([(map_width, 0), (map_width, map_height)], fill=_INK["rule"], width=metrics.pt(0.55))
-    draw.text((metrics.mm(2.5), map_height - metrics.mm(2.5)), "(a)", font=metrics.font(11.0, layout.FontWeight.BOLD),
+    draw.text((metrics.mm(2.5), map_height - metrics.mm(2.5)), "A", font=metrics.font(11.0, layout.FontWeight.BOLD),
               fill=_INK["primary"], anchor="ls")
-    draw.text((map_width + metrics.mm(2.5), metrics.mm(4.0)), "(b)",
+    draw.text((map_width + metrics.mm(2.5), metrics.mm(4.0)), "B",
               font=metrics.font(11.0, layout.FontWeight.BOLD), fill=_INK["primary"], anchor="la")
 
     panel_left = map_width + metrics.mm(16.0)

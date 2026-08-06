@@ -87,7 +87,12 @@ figure_s1b <- leaveout |>
                            sprintf("R² = %.3f\n(-%.1f%%)", R2, reduction_pct))
     ) |>
     ggplot(aes(scenario, R2)) +
-    geom_col(width = 0.6, fill = PAL_SEASON[[SPRING]], colour = INK_SECONDARY, linewidth = 0.15) +
+    # Neutral, not the Spring colour: these bars are PERMANOVA R2 for removal scenarios, and panel A's
+    # "Higher in" legend sits beside them. Sharing Spring's fill invited the legend to be read as
+    # applying here too.
+    # 用中性色而非春季色：本板为移除情景下的 PERMANOVA R2，与 A 板的「季节」图例并列，若沿用春季填充色，
+    # 读者会误以为该图例同样适用于本板。
+    geom_col(width = 0.6, fill = INK_NEUTRAL, colour = INK_SECONDARY, linewidth = 0.15) +
     geom_text(aes(label = label), vjust = -0.35, size = text_size(BASE_PT), colour = INK_PRIMARY,
               lineheight = 1.05) +
     scale_y_continuous(expand = expansion(mult = c(0, 0.22))) +
