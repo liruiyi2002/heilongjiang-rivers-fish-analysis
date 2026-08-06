@@ -12,7 +12,7 @@
 - **R ≥ 4.1**（原生 `|>` 管道；已在 4.3.3 上测试）。
 - 仅图 1 需要：**Python ≥ 3.12** 与 Pillow —— 见
   [`map_generator/README.zh-CN.md`](map_generator/README.zh-CN.md)。R 流程本身无需 Python。
-- 首次运行时由 `00_setup.R` **自动安装**缺失的包：`vegan`、`FD`、`iNEXT`、`indicspecies`、`cluster`、
+- 首次运行时由 `00_setup.R` **自动安装**缺失的包：`vegan`、`FD`、`iNEXT`、`indicspecies`、`cluster`、`ape`、
   `dplyr`、`tidyr`、`purrr`、`stringr`、`glue`。
 - **绘图：** `ggplot2`、`patchwork`、`scales`、`ggrepel`，首次运行时由 `figure_style.R` 自动安装。
 - **无需** `betapart`。脚本 `03` 直接由 UPGMA 性状树的枝长自行计算功能 beta 多样性分解。

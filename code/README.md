@@ -14,7 +14,7 @@ No internet or raw sequence reads are needed (only a one-off package install on 
 - Figure 1 only: **Python ≥ 3.12** with Pillow — see
   [`map_generator/README.md`](map_generator/README.md). The R pipeline does not need it.
 - Packages, **installed automatically** by `00_setup.R` if missing: `vegan`, `FD`, `iNEXT`,
-  `indicspecies`, `cluster`, `dplyr`, `tidyr`, `purrr`, `stringr`, `glue`.
+  `indicspecies`, `cluster`, `ape`, `dplyr`, `tidyr`, `purrr`, `stringr`, `glue`.
 - **Figures:** `ggplot2`, `patchwork`, `scales`, `ggrepel`, installed by `figure_style.R` on first run.
 - **Not required:** `betapart`. Script `03` computes the functional beta-diversity partition itself, from
   branch lengths on a UPGMA trait dendrogram.
