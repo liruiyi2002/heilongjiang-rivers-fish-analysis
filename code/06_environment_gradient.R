@@ -25,7 +25,7 @@ set.seed(RANDOM_SEED)
 # plot-ready ordination coordinates, arrow coordinates and pair lists, so each figure is drawn from the same numbers
 # this script reports rather than from a second, independent computation.
 # 本脚本的输出文件；图 6-8 的文件含排序坐标、箭头坐标与样本对清单。
-ALPHA_PC1_FILE <- file.path(OUT_DIR, "alpha_vs_PC1.csv")
+ALPHA_PC1_FILE <- file.path(OUT_DIR, "TableS19_alpha_PC1.csv")
 # The manuscript's only main-text table. / 稿件唯一的正文表格。
 SITE_TABLE_FILE <- file.path(OUT_DIR, "Table1_site_characteristics.csv")
 SECTIONS_FILE  <- file.path(OUT_DIR, "TableS7_spatial_sections.csv")
