@@ -22,6 +22,11 @@ authors:
     given-names: Jilong
     email: wangjilong@hrfri.ac.cn
     orcid: "https://orcid.org/0000-0001-9499-5800"
+# The Citation File Format has no field for non-author contributors: version 1.2.0 defines only
+# `authors` and `contact`. Contributor credit therefore lives in .zenodo.json, which Zenodo reads in
+# preference to this file when both are present.
+# CFF 1.2.0 无"贡献者"字段（仅有 authors 与 contact），故非作者贡献者记于 .zenodo.json；
+# 二者并存时 Zenodo 以后者为准。
 repository-code: "https://github.com/liruiyi2002/heilongjiang-rivers-fish-analysis"
 # The concept DOI, which always resolves to the newest release. The repository cites the newest version by
 # design; the manuscript cites a specific version DOI instead, as Zenodo recommends for publications.
@@ -30,5 +35,5 @@ repository-code: "https://github.com/liruiyi2002/heilongjiang-rivers-fish-analys
 url: "https://doi.org/10.5281/zenodo.21622889"
 doi: "10.5281/zenodo.21622889"
 license: CC-BY-NC-4.0
-version: "1.1.1"
-date-released: "2026-08-05"
+version: "1.1.2"
+date-released: "2026-08-07"

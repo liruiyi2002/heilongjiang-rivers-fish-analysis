@@ -1,0 +1,55 @@
+{
+  "title": "Ussuri River freshwater-fish eDNA: analysis code and data",
+  "upload_type": "software",
+  "access_right": "open",
+  "license": "cc-by-nc-4.0",
+  "version": "1.1.2",
+  "language": "eng",
+  "description": "<p>Reproducible analysis code and derived data for a 12S environmental-DNA metabarcoding study of the freshwater fish community of the Ussuri River (Amur basin), covering composition, alpha and beta diversity, taxonomic-functional coupling, and the longitudinal hydro-geographic gradient.</p><p>The pipeline reproduces every result, table and figure in the associated article from the deposited data, with no internet access and no raw sequence reads required. Raw reads are deposited separately in the NCBI Sequence Read Archive under BioProject PRJNA1509015.</p><p>Code is licensed under the PolyForm Noncommercial License 1.0.0 and data under CC BY-NC 4.0; the OpenStreetMap extracts under <code>data/geo/</code> remain under ODbL, which cannot be relicensed.</p>",
+  "notes": "If you use this code or data, please cite the associated article and this repository.",
+  "keywords": [
+    "environmental DNA",
+    "metabarcoding",
+    "species turnover",
+    "functional evenness",
+    "river continuum concept",
+    "stream order",
+    "transboundary river",
+    "Amur basin"
+  ],
+  "creators": [
+    {
+      "name": "Li, Ruiyi",
+      "orcid": "0009-0007-4667-3306",
+      "affiliation": "Heilongjiang River Fisheries Research Institute, Chinese Academy of Fishery Sciences, Harbin, China"
+    },
+    {
+      "name": "Li, Peilun",
+      "affiliation": "Heilongjiang River Fisheries Research Institute, Chinese Academy of Fishery Sciences, Harbin, China"
+    },
+    {
+      "name": "Liu, Jiacheng",
+      "affiliation": "Ningxia Fisheries Research Institute, Yinchuan, China"
+    },
+    {
+      "name": "Xiong, Shuhan",
+      "affiliation": "Heilongjiang River Fisheries Research Institute, Chinese Academy of Fishery Sciences, Harbin, China"
+    },
+    {
+      "name": "Yu, Jiaoyang",
+      "affiliation": "College of Fisheries and Life Science, Dalian Ocean University, Dalian, China"
+    },
+    {
+      "name": "Wang, Jilong",
+      "orcid": "0000-0001-9499-5800",
+      "affiliation": "Heilongjiang River Fisheries Research Institute, Chinese Academy of Fishery Sciences, Harbin, China"
+    }
+  ],
+  "contributors": [
+    {
+      "name": "Hadjibagheri, Pouria",
+      "type": "Researcher",
+      "affiliation": "University College London, London, UK"
+    }
+  ]
+}
