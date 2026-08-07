@@ -2,7 +2,7 @@ English (authoritative)  ·  中文说明: LICENSE-DATA.zh-CN
 
 Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)
 
-Copyright (c) 2026 Ruiyi Li, Peilun Li, Jiacheng Liu, Shuhan Xiong and Jilong Wang.
+Copyright (c) 2026 Ruiyi Li, Peilun Li, Jiacheng Liu, Shuhan Xiong, Jiaoyang Yu and Jilong Wang.
 
 The DATA and DOCUMENTATION in this repository -- the CSV files in `data/`, the tables generated in
 `outputs/`, and the accompanying documentation -- are licensed under the Creative Commons
@@ -33,6 +33,6 @@ How to attribute:
   Please cite the associated publication (see CITATION.cff, or CITATION.bib for a BibTeX/LaTeX entry)
   together with this repository:
 
-  Li R, Li P, Liu J, Xiong S, Wang J. Longitudinal environmental gradients shape fish community
-  composition rather than local alpha diversity in the Ussuri River (analysis code and data).
+  Li R, Li P, Liu J, Xiong S, Yu J, Wang J. Longitudinal gradients shape fish community composition
+  rather than alpha diversity in the Ussuri River (analysis code and data).
   https://github.com/liruiyi2002/heilongjiang-rivers-fish-analysis
