@@ -79,7 +79,7 @@ NCBI Sequence Read Archive (see the manuscript's data-availability statement for
 Please cite the associated article together with this repository — see [`CITATION.cff`](CITATION.cff),
 or [`CITATION.bib`](CITATION.bib) for a BibTeX/LaTeX entry. The repository has a
 persistent DOI on Zenodo: [10.5281/zenodo.21622889](https://doi.org/10.5281/zenodo.21622889). That DOI covers all versions and
-resolves to the most recent; the results in the article were produced with **v1.1.1**.
+resolves to the most recent; the results in the article were produced with **v1.1.2**.
 
 ## License
 
